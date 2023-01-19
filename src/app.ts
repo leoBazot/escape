@@ -1,6 +1,7 @@
+import * as BABYLON from 'babylonjs'
 import "@babylonjs/core/Debug/debugLayer";
 import "@babylonjs/inspector";
-import "@babylonjs/loaders/glTF";
+import "babylonjs-loaders";
 import { Engine, Scene, ArcRotateCamera, Vector3, HemisphericLight, Mesh, MeshBuilder } from "@babylonjs/core";
 
 class App {
@@ -21,6 +22,14 @@ class App {
         var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
         var sphere: Mesh = MeshBuilder.CreateSphere("sphere", { diameter: 1 }, scene);
 
+        BABYLON.SceneLoader.ImportMeshAsync("salle", "/salle_travail_avecBool.glb", "salle_travail_avecBool.glb").then((result) => {
+            console.log("affichage");
+            scene.createDefaultEnvironment();
+            scene.createDefaultCameraOrLight(true, true, true);
+            result.meshes[1].position.x = 20;
+            const myMesh1 = scene.getMeshByName("salle");
+            myMesh1.rotation.y = Math.PI / 2;
+        });
         // hide/show the Inspector
         window.addEventListener("keydown", (ev) => {
             // Shift+Ctrl+Alt+I
