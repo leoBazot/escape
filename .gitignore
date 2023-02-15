@@ -1,3 +1,5 @@
 node_modules
 dist
 
+# to avoid any mistakes
+*.zip
