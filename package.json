@@ -18,6 +18,7 @@
     },
     "homepage": "https://github.com/leoBazot/escape#readme",
     "dependencies": {
+        "@babylonjs/loaders": "^5.46.0",
         "babylonjs": "^5.33.2"
     },
     "devDependencies": {
