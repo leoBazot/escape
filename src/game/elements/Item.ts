@@ -1,12 +1,14 @@
 class Item {
     private _name: string;
     private _description: string;
+    private _modelPath: string;
     private _imagePath: string;
 
 
-    constructor(name: string, description: string, imagePath: string) {
+    constructor(name: string, description: string, modelPath: string, imagePath: string) {
         this._name = name;
         this._description = description;
+        this._modelPath = modelPath;
         this._imagePath = imagePath;
     }
 
@@ -22,3 +24,5 @@ class Item {
         return this._imagePath;
     }
 }
+
+export default Item;

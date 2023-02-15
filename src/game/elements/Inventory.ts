@@ -1,4 +1,5 @@
-import InventoryFull from "../errors/game/InventoryErrors";
+import { createInventoryFullError, InventoryFullError } from "../errors/InventoryErrors";
+import Item from "./Item";
 
 class Inventory {
 
@@ -10,16 +11,20 @@ class Inventory {
         this._items = [];
     }
 
-    public addItem(item: Item): InventoryFull | void {
+    public addItem(item: Item): InventoryFullError | void {
         if (this._capacity <= this._items.length) {
             this._items.push(item);
         } else {
-            return new InventoryFull(this._capacity);
+            return createInventoryFullError(this);
         }
     }
 
     public get items(): Item[] {
         return this._items;
+    }
+
+    public get capacity(): number {
+        return this._capacity;
     }
 
     public getItem(index: number): Item {
