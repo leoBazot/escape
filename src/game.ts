@@ -1,6 +1,10 @@
-import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight } from "@babylonjs/core";
+import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight, MeshBuilder, KeyboardEventTypes, KeyboardInfo, Matrix, AbstractMesh, Mesh } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
 import "@babylonjs/loaders"
+import ItemController from "./game/controller/ItemController";
+import Item from "./game/elements/Item";
+import ItemView from "./game/view/ItemView";
+//import { Mesh, MeshBuilder, SphereDirectedParticleEmitter } from "babylonjs";
 
 enum GameState {
     Menu,
@@ -129,6 +133,11 @@ class Game {
         this.setState(GameState.Menu);
     }
 
+    public ramasserItem(pickedMesh: AbstractMesh): void {
+        console.log("tentative de ramassage");
+        this._scene.getMeshById(pickedMesh.id).removeChild;
+    }
+
     private _displayGame(): void {
         let scene = new Scene(this._engine);
 
@@ -139,9 +148,43 @@ class Game {
         SceneLoader.ImportMesh(
             "",
             "./models/rooms/",
-            "salle_travail.glb",
+            "salle_travail_avecBool.glb",
             scene,
         );
+
+        var ramassable: Item = new Item("item utile", "objet de test pour le ramassage et la mise en inventaire", "./models/", null);
+        var ramassableVue: ItemView = new ItemView(this._scene, ramassable);
+        ramassableVue.displayItem();
+        
+        var pickable: Mesh = MeshBuilder.CreateSphere("item utile", {diameter: 0.2}, scene);
+        pickable.setPositionWithLocalVector(new Vector3(-5, 1, -5)); 
+        pickable.metadata = "pick";
+        
+        scene.onKeyboardObservable.add((kbInfo) => {
+            if ((kbInfo.event.key== "e") || (kbInfo.event.key== "E")) {
+                var ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);	
+
+                var hit = scene.pickWithRay(ray);
+
+                if (hit.pickedMesh && hit.pickedMesh.metadata == "pick"){
+                    console.log("ramasse")
+                    this.ramasserItem(hit.pickedMesh);
+                }
+            }
+        });
+        // scene.onKeyboardObservable.add((kbInfo) => {
+        //     switch (kbInfo.type) {
+        //       case KeyboardEventTypes.KEYDOWN:
+        //         console.log("KEY DOWN: ", kbInfo.event.key);
+        //         break;
+        //       case KeyboardEventTypes.KEYUP:
+        //         switch (kbInfo.event.key) {
+        //             case "e": ramasserItem()
+        //         }
+        //         console.log("KEY UP: ", kbInfo.event.code);
+        //         break;
+        //     }
+        //   });
 
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
