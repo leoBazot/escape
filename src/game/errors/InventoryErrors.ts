@@ -1,4 +1,4 @@
-import Inventory from "../elements/Inventory";
+import Inventory from "../models/Inventory";
 
 class InventoryFullError extends Error {
 

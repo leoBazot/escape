@@ -1,14 +1,8 @@
 import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
 import "@babylonjs/loaders"
-
-enum GameState {
-    Menu,
-    Play,
-    Enigma,
-    Pause,
-    GameOver
-}
+import { GameState } from "./game/GameState";
+import { PlayerSettings, GameSettings } from "./game/models/Settings";
 
 class Game {
 
@@ -16,6 +10,9 @@ class Game {
     private _canvas: HTMLCanvasElement;
     private _scene: Scene;
     private _state: GameState;
+    private _Psettings: PlayerSettings;
+    private _Gsettings: GameSettings;
+
 
     constructor() {
         var canvas = this._createCanvas();
@@ -24,13 +21,26 @@ class Game {
         this._scene = new Scene(this._engine);
         this._state = GameState.Menu;
 
+        this.initSettings();
+
         this.start();
     }
 
-    //set up the canvas
+    initSettings() {
+        this._Psettings = new PlayerSettings();
+        this._Psettings.mouseSens = 0.5;
+        this._Psettings.volume = 0.5;
+
+        this._Gsettings = new GameSettings();
+        this._Gsettings.fps = 30;
+        this._Gsettings.mouseSens = 0.5;
+        this._Gsettings.volume = 0.5;
+    }
+
+    // set up the canvas
     private _createCanvas(): HTMLCanvasElement {
 
-        //Commented out for development
+        // Commented out for development
         document.documentElement.style["overflow"] = "hidden";
         document.documentElement.style.overflow = "hidden";
         document.documentElement.style.width = "100%";
@@ -43,7 +53,7 @@ class Game {
         document.body.style.margin = "0";
         document.body.style.padding = "0";
 
-        //create the canvas html element and attach it to the webpage
+        // create the canvas html element and attach it to the webpage
         this._canvas = document.createElement("canvas");
         this._canvas.style.width = "100%";
         this._canvas.style.height = "100%";
@@ -62,7 +72,6 @@ class Game {
                     this._scene.render();
                     break;
                 case GameState.Play:
-                    // Update the game state
                     this._scene.render();
                     break;
                 case GameState.Enigma:
@@ -109,8 +118,7 @@ class Game {
 
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(() => {
-            console.log("start button clicked");
-            this.setState(GameState.Play);
+            this._state = GameState.Play;
             this._displayGame();
         });
 
@@ -126,32 +134,80 @@ class Game {
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
         this._scene = scene;
-        this.setState(GameState.Menu);
+        // this.state = GameState.Menu;
     }
 
     private _displayGame(): void {
         let scene = new Scene(this._engine);
 
-        var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), scene);
-        camera.attachControl(this._canvas, true);
+        // var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), scene);
+        // camera.attachControl(this._canvas, true);
         var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
 
-        SceneLoader.ImportMesh(
-            "",
-            "./models/rooms/",
-            "salle_travail.glb",
-            scene,
-        );
+        scene.onPointerDown = (evt) => {
+            if (evt.button === 0) {
+                if (this._engine.isPointerLock) {
+                    this._engine.exitPointerlock();
+                } else {
+                    this._engine.enterPointerlock();
+                }
+            }
+        }
+
+        // game physics
+        const gravity = -9.81 / this._Gsettings.fps;
+
+        scene.gravity = new Vector3(0, gravity, 0);
+        scene.collisionsEnabled = true;
+
+
+        this.CreateEnvironment(scene);
+
+        this.CreateCamera(scene);
+
 
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
         this._scene = scene;
-        this.setState(GameState.Menu);
+        // this._state = GameState.Menu;
     }
 
-    public setState(state: GameState): void {
-        this._state = state;
+    async CreateEnvironment(scene: Scene): Promise<void> {
+        const room = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/rooms/",
+            "salle_travail_avecBool.glb",
+            scene,
+        );
+
+        room.meshes.map((mesh) => {
+            mesh.checkCollisions = true;
+        });
+
+        this._engine.enterPointerlock();
     }
+
+    CreateCamera(scene: Scene): void {
+        const camera = new FreeCamera("camera", new Vector3(-2, 3, -12), scene);
+
+        camera.attachControl();
+
+        camera.applyGravity = true;
+        camera.checkCollisions = true;
+
+        camera.ellipsoid = new Vector3(1, 1, 1);
+
+        camera.minZ = 0.45;// resolve clipping issue
+        camera.speed = 0.5;
+        camera.angularSensibility = 3200;
+
+        // zqsd
+        camera.keysUp.push(90);
+        camera.keysDown.push(83);
+        camera.keysLeft.push(81);
+        camera.keysRight.push(68);
+    }
+
 }
 
 new Game();

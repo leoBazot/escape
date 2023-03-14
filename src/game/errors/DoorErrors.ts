@@ -1,4 +1,4 @@
-import Door from "../elements/Door";
+import Door from "../models/Door";
 
 class WrongKeyError extends Error {
 
