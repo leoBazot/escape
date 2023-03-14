@@ -188,7 +188,7 @@ class Game {
     }
 
     CreateCamera(scene: Scene): void {
-        const camera = new FreeCamera("camera", new Vector3(-2, 3, -12), scene);
+        const camera = new FreeCamera("camera", new Vector3(-2, 2, -12), scene);
 
         camera.attachControl();
 
