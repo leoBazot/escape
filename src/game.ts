@@ -1,6 +1,7 @@
-import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight } from "@babylonjs/core";
+import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight, DynamicTexture, StandardMaterial, MeshBuilder, Matrix } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
 import "@babylonjs/loaders"
+import { Camera } from "babylonjs";
 import { GameState } from "./game/GameState";
 import { PlayerSettings, GameSettings } from "./game/models/Settings";
 
@@ -144,15 +145,7 @@ class Game {
         // camera.attachControl(this._canvas, true);
         var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
 
-        scene.onPointerDown = (evt) => {
-            if (evt.button === 0) {
-                if (this._engine.isPointerLock) {
-                    this._engine.exitPointerlock();
-                } else {
-                    this._engine.enterPointerlock();
-                }
-            }
-        }
+
 
         // game physics
         const gravity = -9.81 / this._Gsettings.fps;
@@ -160,11 +153,11 @@ class Game {
         scene.gravity = new Vector3(0, gravity, 0);
         scene.collisionsEnabled = true;
 
-
         this.CreateEnvironment(scene);
 
-        this.CreateCamera(scene);
+        const camera = this.CreateCamera(scene);
 
+        this.CreateRay(scene, camera);
 
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
@@ -187,7 +180,7 @@ class Game {
         this._engine.enterPointerlock();
     }
 
-    CreateCamera(scene: Scene): void {
+    CreateCamera(scene: Scene): FreeCamera {
         const camera = new FreeCamera("camera", new Vector3(-2, 2, -12), scene);
 
         camera.attachControl();
@@ -206,6 +199,67 @@ class Game {
         camera.keysDown.push(83);
         camera.keysLeft.push(81);
         camera.keysRight.push(68);
+
+        this.addCrosshair(scene, camera);
+
+        return camera;
+    }
+
+    addCrosshair(scene, camera) {
+        let w = 128
+
+        let texture = new DynamicTexture('reticule', w, scene, false)
+        texture.hasAlpha = true
+
+        let ctx = texture.getContext()
+        let reticule
+
+        let l = 16
+
+        ctx.fillRect(w / 2, w / 2, l, l)
+        ctx.stroke()
+        ctx.beginPath()
+
+        texture.update()
+
+        let material = new StandardMaterial('reticule', scene)
+        material.diffuseTexture = texture
+        material.opacityTexture = texture
+        material.emissiveColor.set(0, 0, 0)
+        material.disableLighting = true
+
+        let plane = MeshBuilder.CreatePlane('reticule', { size: 0.04 }, scene)
+        plane.material = material
+        plane.position.set(0, 0, 1.1)
+        plane.isPickable = false
+
+        reticule = plane
+        reticule.parent = camera
+        return reticule
+    }
+
+    CreateRay(scene: Scene, camera: FreeCamera): void {
+        scene.onPointerDown = (evt) => {
+            // left click
+            if (evt.button === 0) {
+                const ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
+
+                const raycastHit = scene.pickWithRay(ray);
+
+                if (raycastHit.hit) {
+                    console.log("hit : ", raycastHit.pickedMesh.name);
+                }
+            }
+
+            // right click
+            if (evt.button === 2) {
+                if (this._engine.isPointerLock) {
+                    this._engine.exitPointerlock();
+                } else {
+                    this._engine.enterPointerlock();
+                }
+            }
+        };
     }
 
 }
