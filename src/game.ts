@@ -1,18 +1,12 @@
-import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight, Matrix } from "@babylonjs/core";
+import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight, Matrix, DynamicTexture, StandardMaterial, MeshBuilder } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
 import "@babylonjs/loaders";
 import InventoryController from "./game/controller/InventoryController";
 import Inventory from "./game/elements/Inventory";
 import Item from "./game/elements/Item";
 import ItemView from "./game/view/ItemView";
-
-enum GameState {
-    Menu,
-    Play,
-    Enigma,
-    Pause,
-    GameOver
-}
+import { GameState } from "./game/GameState";
+import { PlayerSettings, GameSettings } from "./game/models/Settings";
 
 class Game {
 
@@ -20,6 +14,9 @@ class Game {
     private _canvas: HTMLCanvasElement;
     private _scene: Scene;
     private _state: GameState;
+    private _Psettings: PlayerSettings;
+    private _Gsettings: GameSettings;
+
 
     constructor() {
         var canvas = this._createCanvas();
@@ -28,13 +25,26 @@ class Game {
         this._scene = new Scene(this._engine);
         this._state = GameState.Menu;
 
+        this.initSettings();
+
         this.start();
     }
 
-    //set up the canvas
+    initSettings() {
+        this._Psettings = new PlayerSettings();
+        this._Psettings.mouseSens = 0.5;
+        this._Psettings.volume = 0.5;
+
+        this._Gsettings = new GameSettings();
+        this._Gsettings.fps = 30;
+        this._Gsettings.mouseSens = 0.5;
+        this._Gsettings.volume = 0.5;
+    }
+
+    // set up the canvas
     private _createCanvas(): HTMLCanvasElement {
 
-        //Commented out for development
+        // Commented out for development
         document.documentElement.style["overflow"] = "hidden";
         document.documentElement.style.overflow = "hidden";
         document.documentElement.style.width = "100%";
@@ -47,7 +57,7 @@ class Game {
         document.body.style.margin = "0";
         document.body.style.padding = "0";
 
-        //create the canvas html element and attach it to the webpage
+        // create the canvas html element and attach it to the webpage
         this._canvas = document.createElement("canvas");
         this._canvas.style.width = "100%";
         this._canvas.style.height = "100%";
@@ -66,7 +76,6 @@ class Game {
                     this._scene.render();
                     break;
                 case GameState.Play:
-                    // Update the game state
                     this._scene.render();
                     break;
                 case GameState.Enigma:
@@ -113,14 +122,9 @@ class Game {
 
         //this handles interactions with the start button attached to the scene
         startBtn.onPointerDownObservable.add(() => {
-            console.log("start button clicked");
-            this.setState(GameState.Play);
+            this._state = GameState.Play;
             this._displayGame();
         });
-
-        // SceneLoader.ImportMesh("", "./models/rooms/", "salle_travail.glb", scene, (meshes) => {
-        //     console.log("meshes", meshes);
-        // });
 
         await scene.whenReadyAsync();
 
@@ -130,22 +134,25 @@ class Game {
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
         this._scene = scene;
-        this.setState(GameState.Menu);
+        // this.state = GameState.Menu;
     }
 
     private async _displayGame(): Promise<void> {
         let scene = new Scene(this._engine);
 
-        var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), scene);
-        camera.attachControl(this._canvas, true);
         var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
 
-        SceneLoader.ImportMesh(
-            "",
-            "./models/rooms/",
-            "salle_travail_avecBool.glb",
-            scene
-        );
+        // game physics
+        const gravity = -9.81 / this._Gsettings.fps;
+
+        scene.gravity = new Vector3(0, gravity, 0);
+        scene.collisionsEnabled = true;
+
+        this.CreateEnvironment(scene);
+
+        const camera = this.CreateCamera(scene);
+
+        this.CreateRay(scene, camera);
 
         var posItem: Vector3 = new Vector3(-5, 0, -5);
         var tailleStandard: Vector3 = new Vector3(0.08, 0.08, 0.08);
@@ -159,7 +166,6 @@ class Game {
         
         scene.onPreKeyboardObservable.add((kbInfo) => {
             if ((kbInfo.event.key== "e") || (kbInfo.event.key== "E")) {
-                console.log("Oêuh");
                 var ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);	
 
                 var hit = scene.pickWithRay(ray);
@@ -171,29 +177,119 @@ class Game {
                 }
             }
         });
-        // scene.onKeyboardObservable.add((kbInfo) => {
-        //     switch (kbInfo.type) {
-        //       case KeyboardEventTypes.KEYDOWN:
-        //         console.log("KEY DOWN: ", kbInfo.event.key);
-        //         break;
-        //       case KeyboardEventTypes.KEYUP:
-        //         switch (kbInfo.event.key) {
-        //             case "e": ramasserItem()
-        //         }
-        //         console.log("KEY UP: ", kbInfo.event.code);
-        //         break;
-        //     }
-        //   });
 
         //lastly set the current state to the start state and set the scene to the start scene
         this._scene.dispose();
         this._scene = scene;
-        this.setState(GameState.Menu);
+        // this._state = GameState.Menu;
     }
 
-    public setState(state: GameState): void {
-        this._state = state;
+    async CreateEnvironment(scene: Scene): Promise<void> {
+        const room = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/rooms/",
+            "salle_travailRedim.glb",
+            scene
+        );
+
+        room.meshes.map((mesh) => {
+            mesh.checkCollisions = true;
+        });
+
+
+        const chair = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/furnitures/",
+            "chaise.glb",
+            scene,
+        );
+
+        chair.meshes.forEach((mesh) => {
+            mesh.scaling = new Vector3(0.08, 0.08, 0.08);
+            mesh.position = new Vector3(-5, 0, -5);
+            mesh.onDispose = () => {
+                chair.meshes.map((mesh) => {
+                    if (!mesh.isDisposed()) {
+                        mesh.dispose();
+                    }
+                });
+            };
+        });
+
+        this._engine.enterPointerlock();
     }
+
+    CreateCamera(scene: Scene): FreeCamera {
+        const camera = new FreeCamera("camera", new Vector3(-2, 2, -12), scene);
+
+        camera.attachControl();
+
+        camera.applyGravity = true;
+        camera.checkCollisions = true;
+
+        camera.ellipsoid = new Vector3(1, 1, 1);
+
+        camera.minZ = 0.45; // resolve clipping issue
+        camera.speed = 0.5;
+        camera.angularSensibility = 3200;
+
+        // zqsd
+        camera.keysUp.push(90);
+        camera.keysDown.push(83);
+        camera.keysLeft.push(81);
+        camera.keysRight.push(68);
+
+        this.addCrosshair(scene, camera);
+
+        return camera;
+    }
+
+    addCrosshair(scene, camera) {
+        let w = 128
+
+        let texture = new DynamicTexture('reticule', w, scene, false)
+        texture.hasAlpha = true
+
+        let ctx = texture.getContext()
+        let reticule
+
+        let l = 16
+
+        ctx.fillRect(w / 2, w / 2, l, l)
+        ctx.stroke()
+        ctx.beginPath()
+
+        texture.update()
+
+        let material = new StandardMaterial('reticule', scene)
+        material.diffuseTexture = texture
+        material.opacityTexture = texture
+        material.emissiveColor.set(0, 0, 0)
+        material.disableLighting = true
+
+        let plane = MeshBuilder.CreatePlane('reticule', { size: 0.04 }, scene)
+        plane.material = material
+        plane.position.set(0, 0, 1.1)
+        plane.isPickable = false
+
+        reticule = plane
+        reticule.parent = camera
+        return reticule
+    }
+
+    CreateRay(scene: Scene, camera: FreeCamera): void {
+        scene.onPointerDown = (evt) => {
+            // right click
+            if (evt.button === 2) {
+                if (this._engine.isPointerLock) {
+                    this._engine.exitPointerlock();
+                } else {
+                    this._engine.enterPointerlock();
+                }
+            }
+        };
+    }
+
 }
 
 new Game();
