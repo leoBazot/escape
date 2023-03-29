@@ -1,6 +1,6 @@
 import Inventory from "../elements/Inventory";
 import { createInventoryFullError, InventoryFullError } from "../errors/InventoryErrors";
-import Item from "./ItemController";
+import Item from "../elements/Item";
 
 class InventoryController {
     private inventory: Inventory;
@@ -41,4 +41,4 @@ class InventoryController {
     }
 }
 
-export default Item;
+export default InventoryController;

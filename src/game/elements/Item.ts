@@ -5,14 +5,17 @@ class Item {
     private _description: string;
     private _modelPath: string;
     private _texturePath: string;
-    private _position: Vector3
+    private _iconPath: string;
+    private _position: Vector3;
 
 
-    constructor(name: string, description: string, modelPath: string, texturePath: string) {
+    constructor(name: string, description: string, modelPath: string, texturePath: string, iconPath: string, position: Vector3) {
         this._name = name;
         this._description = description;
         this._modelPath = modelPath;
         this._texturePath = texturePath;
+        this._iconPath = iconPath;
+        this._position = position;
     }
 
     public get name(): string {
@@ -29,6 +32,10 @@ class Item {
 
     public get texture(): string {
         return this._texturePath;
+    }
+
+    public get icon(): string{
+        return this._iconPath;
     }
 
     public get position(): Vector3{
@@ -50,6 +57,10 @@ class Item {
 
     public set texture(texture: string){
         this._texturePath=texture;
+    }
+
+    public set icon(icon: string){
+        this._iconPath = icon;
     }
 
     public set position(position: Vector3){

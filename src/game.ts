@@ -1,10 +1,10 @@
-import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight, MeshBuilder, KeyboardEventTypes, KeyboardInfo, Matrix, AbstractMesh, Mesh } from "@babylonjs/core";
+import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight, Matrix } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
-import "@babylonjs/loaders"
-import ItemController from "./game/controller/ItemController";
+import "@babylonjs/loaders";
+import InventoryController from "./game/controller/InventoryController";
+import Inventory from "./game/elements/Inventory";
 import Item from "./game/elements/Item";
 import ItemView from "./game/view/ItemView";
-//import { Mesh, MeshBuilder, SphereDirectedParticleEmitter } from "babylonjs";
 
 enum GameState {
     Menu,
@@ -133,12 +133,7 @@ class Game {
         this.setState(GameState.Menu);
     }
 
-    public ramasserItem(pickedMesh: AbstractMesh): void {
-        console.log("tentative de ramassage");
-        this._scene.getMeshById(pickedMesh.id).removeChild;
-    }
-
-    private _displayGame(): void {
+    private async _displayGame(): Promise<void> {
         let scene = new Scene(this._engine);
 
         var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), scene);
@@ -149,26 +144,30 @@ class Game {
             "",
             "./models/rooms/",
             "salle_travail_avecBool.glb",
-            scene,
+            scene
         );
 
-        var ramassable: Item = new Item("item utile", "objet de test pour le ramassage et la mise en inventaire", "./models/", null);
-        var ramassableVue: ItemView = new ItemView(this._scene, ramassable);
-        ramassableVue.displayItem();
+        var posItem: Vector3 = new Vector3(-5, 0, -5);
+        var tailleStandard: Vector3 = new Vector3(0.08, 0.08, 0.08);
+        var inventory = new Inventory(6);
+        var inventoryController = new InventoryController(inventory);
+        var ramassable: Item = new Item("chaise", "chaise.glb", "./models/", null, null, posItem);
+        var ramassableVue: ItemView = new ItemView(scene, ramassable);
+        await ramassableVue.displayItem();
+        ramassableVue.majPosition();
+        ramassableVue.redimensionner(tailleStandard);
         
-        var pickable: Mesh = MeshBuilder.CreateSphere("item utile", {diameter: 0.2}, scene);
-        pickable.setPositionWithLocalVector(new Vector3(-5, 1, -5)); 
-        pickable.metadata = "pick";
-        
-        scene.onKeyboardObservable.add((kbInfo) => {
+        scene.onPreKeyboardObservable.add((kbInfo) => {
             if ((kbInfo.event.key== "e") || (kbInfo.event.key== "E")) {
+                console.log("Oêuh");
                 var ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);	
 
                 var hit = scene.pickWithRay(ray);
 
-                if (hit.pickedMesh && hit.pickedMesh.metadata == "pick"){
+                if (hit.pickedMesh && hit.pickedMesh instanceof Item){
                     console.log("ramasse")
-                    this.ramasserItem(hit.pickedMesh);
+                    inventoryController.ajoutItem(hit.pickedMesh);
+                    ramassableVue.hideItem();
                 }
             }
         });

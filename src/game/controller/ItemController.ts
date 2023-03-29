@@ -16,4 +16,4 @@ class ItemController {
     }
 }
 
-export default Item;
+export default ItemController;

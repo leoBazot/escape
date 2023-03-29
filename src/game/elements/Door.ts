@@ -1,3 +1,4 @@
+import { Vector3 } from "@babylonjs/core";
 import { WrongKeyError, createWrongKeyError } from "../errors/DoorErrors";
 import Item from "./Item";
 import Key from "./Key";
@@ -7,8 +8,8 @@ class Door extends Item {
     private _isLocked: boolean;
     private _key: Key;
 
-    constructor(name: string, description: string, modelPath: string, imagePath: string, key: Key) {
-        super(name, description, modelPath, imagePath);
+    constructor(name: string, description: string, modelPath: string, texturePath: string, iconPath: string, position: Vector3, key: Key) {
+        super(name, description, modelPath, texturePath, iconPath, position);
         this._isLocked = true;
         this._key = key;
     }
