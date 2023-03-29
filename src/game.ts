@@ -2,8 +2,8 @@ import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamer
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
 import "@babylonjs/loaders";
 import InventoryController from "./game/controller/InventoryController";
-import Inventory from "./game/elements/Inventory";
-import Item from "./game/elements/Item";
+import Inventory from "./game/models/Inventory";
+import Item from "./game/models/Item";
 import ItemView from "./game/view/ItemView";
 import { GameState } from "./game/GameState";
 import { PlayerSettings, GameSettings } from "./game/models/Settings";
@@ -207,6 +207,7 @@ class Game {
         chair.meshes.forEach((mesh) => {
             mesh.scaling = new Vector3(0.08, 0.08, 0.08);
             mesh.position = new Vector3(-5, 0, -5);
+            mesh.checkCollisions = true;
             mesh.onDispose = () => {
                 chair.meshes.map((mesh) => {
                     if (!mesh.isDisposed()) {
@@ -230,7 +231,7 @@ class Game {
         camera.ellipsoid = new Vector3(1, 1, 1);
 
         camera.minZ = 0.45; // resolve clipping issue
-        camera.speed = 0.5;
+        camera.speed = 0.2;
         camera.angularSensibility = 3200;
 
         // zqsd

@@ -1,6 +1,6 @@
-import Inventory from "../elements/Inventory";
+import Inventory from "../models/Inventory";
 import { createInventoryFullError, InventoryFullError } from "../errors/InventoryErrors";
-import Item from "../elements/Item";
+import Item from "../models/Item";
 
 class InventoryController {
     private inventory: Inventory;

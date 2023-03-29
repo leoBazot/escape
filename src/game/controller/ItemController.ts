@@ -1,4 +1,4 @@
-import Item from "../elements/Item";
+import Item from "../models/Item";
 
 class ItemController {
     private item: Item;

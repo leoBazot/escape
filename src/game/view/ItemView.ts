@@ -1,5 +1,5 @@
 import { Scene, SceneLoader, ISceneLoaderAsyncResult, Space, Vector3 } from "@babylonjs/core";
-import Item from "../elements/Item";
+import Item from "../models/Item";
 
 class ItemView {
     private scene: Scene;
