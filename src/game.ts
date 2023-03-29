@@ -1,7 +1,6 @@
-import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight, DynamicTexture, StandardMaterial, MeshBuilder, Matrix } from "@babylonjs/core";
+import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight, DynamicTexture, StandardMaterial, MeshBuilder, Matrix, KeyboardEventTypes, Space } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
-import "@babylonjs/loaders"
-import { Camera } from "babylonjs";
+import "@babylonjs/loaders";
 import { GameState } from "./game/GameState";
 import { PlayerSettings, GameSettings } from "./game/models/Settings";
 
@@ -123,10 +122,6 @@ class Game {
             this._displayGame();
         });
 
-        // SceneLoader.ImportMesh("", "./models/rooms/", "salle_travail.glb", scene, (meshes) => {
-        //     console.log("meshes", meshes);
-        // });
-
         await scene.whenReadyAsync();
 
         //hide the loading screen
@@ -141,11 +136,7 @@ class Game {
     private _displayGame(): void {
         let scene = new Scene(this._engine);
 
-        // var camera: ArcRotateCamera = new ArcRotateCamera("Camera", Math.PI / 2, Math.PI / 2, 2, Vector3.Zero(), scene);
-        // camera.attachControl(this._canvas, true);
         var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
-
-
 
         // game physics
         const gravity = -9.81 / this._Gsettings.fps;
@@ -169,12 +160,32 @@ class Game {
         const room = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
-            "salle_travail_avecBool.glb",
-            scene,
+            "salle_travailRedim.glb",
+            scene
         );
 
         room.meshes.map((mesh) => {
             mesh.checkCollisions = true;
+        });
+
+
+        const chair = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/furnitures/",
+            "chaise.glb",
+            scene,
+        );
+
+        chair.meshes.forEach((mesh) => {
+            mesh.scaling = new Vector3(0.08, 0.08, 0.08);
+            mesh.position = new Vector3(-5, 0, -5);
+            mesh.onDispose = () => {
+                chair.meshes.map((mesh) => {
+                    if (!mesh.isDisposed()) {
+                        mesh.dispose();
+                    }
+                });
+            };
         });
 
         this._engine.enterPointerlock();
@@ -190,7 +201,7 @@ class Game {
 
         camera.ellipsoid = new Vector3(1, 1, 1);
 
-        camera.minZ = 0.45;// resolve clipping issue
+        camera.minZ = 0.45; // resolve clipping issue
         camera.speed = 0.5;
         camera.angularSensibility = 3200;
 
@@ -239,18 +250,22 @@ class Game {
     }
 
     CreateRay(scene: Scene, camera: FreeCamera): void {
-        scene.onPointerDown = (evt) => {
-            // left click
-            if (evt.button === 0) {
-                const ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
 
-                const raycastHit = scene.pickWithRay(ray);
+        scene.onPreKeyboardObservable.add((kbInfo) => {
+            if (kbInfo.type === KeyboardEventTypes.KEYUP) {
+                if (kbInfo.event.key === "e") {
+                    const ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
 
-                if (raycastHit.hit) {
-                    console.log("hit : ", raycastHit.pickedMesh.name);
+                    const raycastHit = scene.pickWithRay(ray);
+
+                    if (raycastHit.hit) {
+                        console.log("hit : ", raycastHit.pickedMesh);
+                        raycastHit.pickedMesh.dispose();
+                    }
                 }
             }
-
+        });
+        scene.onPointerDown = (evt) => {
             // right click
             if (evt.button === 2) {
                 if (this._engine.isPointerLock) {
