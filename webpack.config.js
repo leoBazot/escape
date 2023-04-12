@@ -4,7 +4,8 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const appDirectory = fs.realpathSync(process.cwd());
 
 module.exports = {
-    entry: path.resolve(appDirectory, "src/app.ts"), //path to the main .ts file
+    devtool: 'eval-source-map',
+    entry: path.resolve(appDirectory, "src/game.ts"), //path to the main .ts file
     output: {
         filename: "js/escape.js", //name for the js file that is created/compiled in memory
         clean: true,
@@ -33,7 +34,7 @@ module.exports = {
     plugins: [
         new HtmlWebpackPlugin({
             inject: true,
-            template: path.resolve(appDirectory, "src/public/index.html"),
+            template: path.resolve(appDirectory, "public/index.html"),
         })
     ],
     mode: "development",
