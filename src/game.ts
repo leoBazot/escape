@@ -1,9 +1,10 @@
-import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, HemisphericLight, DynamicTexture, StandardMaterial, MeshBuilder, Matrix, KeyboardEventTypes, PhysicsImpostor, PhysicsJoint, MotorEnabledJoint, Mesh, AbstractMesh, HingeJoint } from "@babylonjs/core";
+import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, HemisphericLight, DynamicTexture, StandardMaterial, MeshBuilder, Matrix, KeyboardEventTypes, AbstractMesh } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
 import "cannon"
 import "@babylonjs/loaders";
 import { GameState } from "./game/GameState";
 import { PlayerSettings, GameSettings } from "./game/models/Settings";
+// import salleTravailPorte from "./models/salleTravailPorte.glb";
 
 window.CANNON = require("cannon");
 class Game {
@@ -164,7 +165,7 @@ class Game {
         const room = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
-            "salle_travailPorte.glb",
+            "salleTravailPorte.glb",
             scene
         );
 
