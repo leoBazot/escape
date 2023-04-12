@@ -1,9 +1,11 @@
-import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, ArcRotateCamera, HemisphericLight, DynamicTexture, StandardMaterial, MeshBuilder, Matrix, KeyboardEventTypes, Space } from "@babylonjs/core";
+import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, HemisphericLight, DynamicTexture, StandardMaterial, MeshBuilder, Matrix, KeyboardEventTypes, PhysicsImpostor, PhysicsJoint, MotorEnabledJoint, Mesh, AbstractMesh, HingeJoint } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
+import "cannon"
 import "@babylonjs/loaders";
 import { GameState } from "./game/GameState";
 import { PlayerSettings, GameSettings } from "./game/models/Settings";
 
+window.CANNON = require("cannon");
 class Game {
 
     private _engine: Engine;
@@ -139,10 +141,12 @@ class Game {
         var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
 
         // game physics
-        const gravity = -9.81 / this._Gsettings.fps;
+        /* const gravity = -9.81 / this._Gsettings.fps;
 
-        scene.gravity = new Vector3(0, gravity, 0);
-        scene.collisionsEnabled = true;
+        // scene.gravity = new Vector3(0, gravity, 0);
+        // scene.collisionsEnabled = true;
+        */
+        scene.enablePhysics();
 
         this.CreateEnvironment(scene);
 
@@ -160,13 +164,64 @@ class Game {
         const room = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
-            "salle_travailRedim.glb",
+            "salle_travailPorte.glb",
             scene
         );
 
+        let door: AbstractMesh;
+
+        let hinge: AbstractMesh;
+
         room.meshes.map((mesh) => {
-            mesh.checkCollisions = true;
+            if (mesh.name.match("hinge.*")) {
+                hinge = mesh;
+
+            } else {
+                mesh.checkCollisions = true;
+            }
+            // console.log(mesh.name, "mon pôpa c'est ", mesh.parent?.name)
+
+            if (mesh.name.match("porte.*")) { // || mesh.parent?.name === "portePause") {
+                //console.log(mesh.name, "mon pôpa c'est ", mesh.parent?.name);
+                //mesh.rotate(new Vector3(0, 1, 0), Math.PI / 4, Space.WORLD);
+                door = mesh;
+            }
+
+
         });
+
+        /*scene.enablePhysics();
+
+
+        door.physicsImpostor = new PhysicsImpostor(door, PhysicsImpostor.BoxImpostor);
+
+        hinge.physicsImpostor = new PhysicsImpostor(hinge, PhysicsImpostor.CylinderImpostor);
+
+        let joint = new MotorEnabledJoint(
+            PhysicsJoint.HingeJoint,
+            {
+                mainPivot: new Vector3(0, 0, 0),
+                connectedPivot: new Vector3(0, -5, 0),
+                mainAxis: new Vector3(0, 1, 0),
+                connectedAxis: new Vector3(0, 1, 0),
+                nativeParams: {
+                }
+            }
+        );
+
+        console.log(joint);
+
+        hinge.physicsImpostor.addJoint(door.physicsImpostor, joint);
+
+        joint.setMotor(1);
+        */
+
+
+        //joint.physicsJoint
+
+        /*scene.registerBeforeRender(function () {
+            hinge.rotate(Axis.Y, 0.04);
+        })*/
 
 
         const chair = await SceneLoader.ImportMeshAsync(
@@ -178,7 +233,8 @@ class Game {
 
         chair.meshes.forEach((mesh) => {
             mesh.scaling = new Vector3(0.08, 0.08, 0.08);
-            mesh.position = new Vector3(-5, 0, -5);
+            mesh.position = new Vector3(-2, 0, -3);
+            mesh.checkCollisions = true;
             mesh.onDispose = () => {
                 chair.meshes.map((mesh) => {
                     if (!mesh.isDisposed()) {
@@ -199,17 +255,20 @@ class Game {
         camera.applyGravity = true;
         camera.checkCollisions = true;
 
-        camera.ellipsoid = new Vector3(1, 1, 1);
+        camera.ellipsoid = new Vector3(0.5, 1.5, 0.5);
 
-        camera.minZ = 0.45; // resolve clipping issue
-        camera.speed = 0.5;
+        camera.minZ = 0.50; // resolve clipping issue
+        camera.speed = 0.3;
         camera.angularSensibility = 3200;
 
         // zqsd
         camera.keysUp.push(90);
-        camera.keysDown.push(83);
         camera.keysLeft.push(81);
+        camera.keysDown.push(83);
         camera.keysRight.push(68);
+
+        // jump on space
+        camera.keysUpward.push(32);
 
         this.addCrosshair(scene, camera);
 
