@@ -274,6 +274,12 @@ class Game {
         camera.keysDown.push(83);
         camera.keysRight.push(68);
 
+        // arrow keys
+        camera.keysUp.push(38);
+        camera.keysLeft.push(37);
+        camera.keysDown.push(40);
+        camera.keysRight.push(39);
+
         // jump on space
         camera.keysUpward.push(32);
 
