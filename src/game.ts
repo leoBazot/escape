@@ -1,9 +1,12 @@
-import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, HemisphericLight, DynamicTexture, StandardMaterial, MeshBuilder, Matrix, KeyboardEventTypes, PhysicsImpostor, PhysicsJoint, MotorEnabledJoint, Mesh, AbstractMesh, HingeJoint } from "@babylonjs/core";
+import { Engine, Scene, Vector3, Color4, FreeCamera, SceneLoader, HemisphericLight, DynamicTexture, StandardMaterial, MeshBuilder, Matrix, KeyboardEventTypes, AbstractMesh } from "@babylonjs/core";
 import { AdvancedDynamicTexture, Button, Control } from "@babylonjs/gui";
 import "cannon"
 import "@babylonjs/loaders";
 import { GameState } from "./game/GameState";
 import { PlayerSettings, GameSettings } from "./game/models/Settings";
+import { Player } from "./game/models/Player";
+import Item from "./game/models/Item";
+// import salleTravailPorte from "./models/salleTravailPorte.glb";
 
 window.CANNON = require("cannon");
 class Game {
@@ -14,7 +17,7 @@ class Game {
     private _state: GameState;
     private _Psettings: PlayerSettings;
     private _Gsettings: GameSettings;
-
+    private _player: Player;
 
     constructor() {
         var canvas = this._createCanvas();
@@ -22,6 +25,8 @@ class Game {
         this._engine = new Engine(canvas, true);
         this._scene = new Scene(this._engine);
         this._state = GameState.Menu;
+
+        this._player = new Player("Player", 10);
 
         this.initSettings();
 
@@ -164,7 +169,7 @@ class Game {
         const room = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
-            "salle_travailPorte.glb",
+            "salleTravailPorte.glb",
             scene
         );
 
@@ -235,6 +240,8 @@ class Game {
             mesh.scaling = new Vector3(0.08, 0.08, 0.08);
             mesh.position = new Vector3(-2, 0, -3);
             mesh.checkCollisions = true;
+
+            mesh.id = "chaise";
             mesh.onDispose = () => {
                 chair.meshes.map((mesh) => {
                     if (!mesh.isDisposed()) {
@@ -312,15 +319,21 @@ class Game {
 
         scene.onPreKeyboardObservable.add((kbInfo) => {
             if (kbInfo.type === KeyboardEventTypes.KEYUP) {
+                // pick up item
                 if (kbInfo.event.key === "e") {
                     const ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
 
                     const raycastHit = scene.pickWithRay(ray);
 
-                    if (raycastHit.hit) {
-                        console.log("hit : ", raycastHit.pickedMesh);
+                    if (raycastHit.hit && raycastHit.pickedMesh.id === "chaise") {
+                        console.log(raycastHit.pickedMesh.id, "ajouté à l'inventaire !");
+                        this._player.inventory.addItem(new Item(raycastHit.pickedMesh.id, "", "", ""));
                         raycastHit.pickedMesh.dispose();
                     }
+                }
+                // open inventory
+                if (kbInfo.event.key === "i") {
+                    console.log(this._player.inventory.items.map((item) => item.name));
                 }
             }
         });

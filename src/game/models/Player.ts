@@ -4,9 +4,9 @@ class Player {
     private _name: string;
     private _inventory: Inventory;
 
-    constructor(name: string, inventory: Inventory) {
+    constructor(name: string, inventoryCapacity: number) {
         this._name = name;
-        this._inventory = inventory;
+        this._inventory = new Inventory(inventoryCapacity);
     }
 
     public get name(): string {
@@ -17,3 +17,5 @@ class Player {
         return this._inventory;
     }
 }
+
+export { Player };

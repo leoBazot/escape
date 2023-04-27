@@ -12,7 +12,7 @@ class Inventory {
     }
 
     public addItem(item: Item): InventoryFullError | void {
-        if (this._capacity <= this._items.length) {
+        if (this._capacity > this._items.length) {
             this._items.push(item);
         } else {
             return createInventoryFullError(this);
