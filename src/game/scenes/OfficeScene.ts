@@ -1,0 +1,244 @@
+import { Engine } from "@babylonjs/core/Engines/engine";
+import { Scene } from "@babylonjs/core/scene";
+import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
+import { Matrix, Vector3 } from "@babylonjs/core/Maths/math";
+import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
+import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
+import { Camera } from "@babylonjs/core/Cameras/camera";
+import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
+import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
+import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
+
+import "@babylonjs/core/Physics/physicsEngineComponent";
+import "@babylonjs/core/Collisions/collisionCoordinator";
+import "@babylonjs/core/Culling/ray";
+import "@babylonjs/core/Physics/Plugins/cannonJSPlugin";
+
+
+import { Player } from "../models/Player";
+import Item from "../models/Item";
+import SceneHandler from "./SceneHandler";
+
+
+class OfficeScene {
+
+    private _player: Player;
+
+    constructor() {
+        this._player = new Player("Monkey", 6);
+    }
+
+
+    public createScene(engine: Engine) {
+        engine.displayLoadingUI();
+
+        SceneHandler.instance.currentScene.detachControl();
+
+        let scene = new Scene(engine);
+
+        var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
+
+        scene.enablePhysics();
+
+        this.CreateEnvironment(scene);
+
+        engine.enterPointerlock();
+
+        const camera = this.CreateCamera(scene);
+
+        this.CreateRay(scene, camera);
+
+        scene.onPointerDown = (evt) => {
+            // right click
+            if (evt.button === 2) {
+                if (!engine.isPointerLock) {
+                    engine.enterPointerlock();
+                }
+            }
+        };
+
+        SceneHandler.instance.currentScene = scene;
+    }
+
+    async CreateEnvironment(scene: Scene): Promise<void> {
+        const room = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/rooms/",
+            "salleTravailPorte.glb",
+            scene
+        );
+
+        let door: AbstractMesh;
+
+        let hinge: AbstractMesh;
+
+        room.meshes.map((mesh) => {
+            if (mesh.name.match("hinge.*")) {
+                hinge = mesh;
+
+            } else {
+                mesh.checkCollisions = true;
+            }
+            // console.log(mesh.name, "mon pôpa c'est ", mesh.parent?.name)
+
+            if (mesh.name.match("porte.*")) { // || mesh.parent?.name === "portePause") {
+                //console.log(mesh.name, "mon pôpa c'est ", mesh.parent?.name);
+                //mesh.rotate(new Vector3(0, 1, 0), Math.PI / 4, Space.WORLD);
+                door = mesh;
+            }
+
+
+        });
+
+        /*
+
+        door.physicsImpostor = new PhysicsImpostor(door, PhysicsImpostor.BoxImpostor);
+
+        hinge.physicsImpostor = new PhysicsImpostor(hinge, PhysicsImpostor.CylinderImpostor);
+
+        let joint = new MotorEnabledJoint(
+            PhysicsJoint.HingeJoint,
+            {
+                mainPivot: new Vector3(0, 0, 0),
+                connectedPivot: new Vector3(0, -5, 0),
+                mainAxis: new Vector3(0, 1, 0),
+                connectedAxis: new Vector3(0, 1, 0),
+                nativeParams: {
+                }
+            }
+        );
+
+        console.log(joint);
+
+        hinge.physicsImpostor.addJoint(door.physicsImpostor, joint);
+
+        joint.setMotor(1);
+        */
+
+
+        //joint.physicsJoint
+
+        /*scene.registerBeforeRender(function () {
+            hinge.rotate(Axis.Y, 0.04);
+        })*/
+
+
+        const chair = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/furnitures/",
+            "chaise.glb",
+            scene,
+        );
+
+        chair.meshes.forEach((mesh) => {
+            mesh.scaling = new Vector3(0.08, 0.08, 0.08);
+            mesh.position = new Vector3(-2, 0, -3);
+            mesh.checkCollisions = true;
+
+            mesh.id = "chaise";
+            mesh.onDispose = () => {
+                chair.meshes.map((mesh) => {
+                    if (!mesh.isDisposed()) {
+                        mesh.dispose();
+                    }
+                });
+            };
+        });
+
+    }
+
+    CreateCamera(scene: Scene): FreeCamera {
+        const camera = new FreeCamera("camera", new Vector3(-2, 2, -12), scene);
+
+        camera.attachControl();
+
+        camera.applyGravity = true;
+        camera.checkCollisions = true;
+
+        camera.ellipsoid = new Vector3(0.5, 1.5, 0.5);
+
+        camera.minZ = 0.50; // resolve clipping issue
+        camera.speed = 0.3;
+        camera.angularSensibility = 3200;
+
+        // zqsd
+        camera.keysUp.push(90);
+        camera.keysLeft.push(81);
+        camera.keysDown.push(83);
+        camera.keysRight.push(68);
+
+        // arrow keys
+        camera.keysUp.push(38);
+        camera.keysLeft.push(37);
+        camera.keysDown.push(40);
+        camera.keysRight.push(39);
+
+        // jump on space
+        camera.keysUpward.push(32);
+
+        this.addCrosshair(scene, camera);
+
+        return camera;
+    }
+
+    addCrosshair(scene: Scene, camera: Camera) {
+        let w = 128
+
+        let texture = new DynamicTexture('reticule', w, scene, false)
+        texture.hasAlpha = true
+
+        let ctx = texture.getContext()
+        let reticule
+
+        let l = 16
+
+        ctx.fillRect(w / 2, w / 2, l, l)
+        ctx.stroke()
+        ctx.beginPath()
+
+        texture.update()
+
+        let material = new StandardMaterial('reticule', scene)
+        material.diffuseTexture = texture
+        material.opacityTexture = texture
+        material.emissiveColor.set(0, 0, 0)
+        material.disableLighting = true
+
+        let plane = MeshBuilder.CreatePlane('reticule', { size: 0.04 }, scene)
+        plane.material = material
+        plane.position.set(0, 0, 1.1)
+        plane.isPickable = false
+
+        reticule = plane
+        reticule.parent = camera
+        return reticule
+    }
+
+    CreateRay(scene: Scene, camera: FreeCamera): void {
+
+        scene.onPreKeyboardObservable.add((kbInfo) => {
+            if (kbInfo.type === KeyboardEventTypes.KEYUP) {
+                // pick up item
+                if (kbInfo.event.key === "e") {
+                    const ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
+
+                    const raycastHit = scene.pickWithRay(ray);
+
+                    if (raycastHit.hit && raycastHit.pickedMesh.id === "chaise") {
+                        console.log(raycastHit.pickedMesh.id, "ajouté à l'inventaire !");
+                        this._player.inventory.addItem(new Item(raycastHit.pickedMesh.id, "", "", ""));
+                        raycastHit.pickedMesh.dispose();
+                    }
+                }
+                // open inventory
+                if (kbInfo.event.key === "i") {
+                    console.log(this._player.inventory.items.map((item) => item.name));
+                }
+            }
+        });
+    }
+}
+
+export default OfficeScene;
