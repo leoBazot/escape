@@ -1,7 +1,6 @@
 class PlayerSettings {
     public mouseSens: number;
     public volume: number;
-    //public fps: number;
 }
 
 class GameSettings {

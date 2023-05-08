@@ -1,15 +1,14 @@
-class Item {
+import { AbstractMesh } from "@babylonjs/core";
+
+abstract class Item {
+    protected _mesh: AbstractMesh;
     private _name: string;
     private _description: string;
-    private _modelPath: string;
-    private _imagePath: string;
 
 
-    constructor(name: string, description: string, modelPath: string, imagePath: string) {
+    constructor(name: string, description: string) {
         this._name = name;
         this._description = description;
-        this._modelPath = modelPath;
-        this._imagePath = imagePath;
     }
 
     public get name(): string {
@@ -20,9 +19,11 @@ class Item {
         return this._description;
     }
 
-    public get image(): string {
-        return this._imagePath;
+    public equals(item: Item): boolean {
+        return this._mesh === item._mesh;
     }
+
+    public abstract use(mesh?: Item): void;
 }
 
 export default Item;

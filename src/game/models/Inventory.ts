@@ -5,10 +5,12 @@ class Inventory {
 
     private _capacity: number;
     private _items: Item[];
+    private _selectedItem: number;
 
     constructor(capacity: number) {
         this._capacity = capacity;
         this._items = [];
+        this._selectedItem = 0;
     }
 
     public addItem(item: Item): InventoryFullError | void {
@@ -27,6 +29,14 @@ class Inventory {
         return this._capacity;
     }
 
+    public set selectedItem(index: number) {
+        if (index >= 0 && index < this._items.length) {
+            this._selectedItem = index;
+        } else {
+            throw new Error("Inventory : Index out of bounds");
+        }
+    }
+
     public getItem(index: number): Item {
         return this._items[index];
     }
@@ -35,6 +45,9 @@ class Inventory {
         this._items.splice(index, 1);
     }
 
+    public getSelectedItem(): Item {
+        return this._items[this._selectedItem];
+    }
 }
 
 export default Inventory;

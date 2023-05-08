@@ -5,10 +5,10 @@ import { WebGPUEngine } from "@babylonjs/core/Engines/webgpuEngine";
 import "@babylonjs/loaders";
 import "@babylonjs/core/Engines/WebGPU/Extensions/engine.uniformBuffer";
 
-import { PlayerSettings, GameSettings } from "./game/models/Settings";
-import { Player } from "./game/models/Player";
-import SceneHandler from "./game/scenes/SceneHandler";
-import createMenuScene from "./game/scenes/MenuScene";
+import { PlayerSettings, GameSettings } from "./Settings";
+import { Player } from "./models/Player";
+import SceneHandler from "./scenes/SceneHandler";
+import createMenuScene from "./scenes/MenuScene";
 
 window.CANNON = require("cannon");
 class Game {

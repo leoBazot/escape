@@ -20,11 +20,14 @@ import "@babylonjs/core/Physics/Plugins/cannonJSPlugin";
 import { Player } from "../models/Player";
 import Item from "../models/Item";
 import SceneHandler from "./SceneHandler";
+import PickableItem from "../models/PickableItem";
+import { createDatabase, getItemByName } from "../models/ModelFactory";
 
 
 class OfficeScene {
 
     private _player: Player;
+    private _database: Map<string, Item>;
 
     constructor() {
         this._player = new Player("Monkey", 6);
@@ -70,18 +73,17 @@ class OfficeScene {
             scene
         );
 
-        let door: AbstractMesh;
+        createDatabase(room.meshes);
+        /*room.meshes.map((mesh) => {
 
-        let hinge: AbstractMesh;
+            console.log(mesh.name);
 
-        room.meshes.map((mesh) => {
             if (mesh.name.match("hinge.*")) {
                 hinge = mesh;
-
+                hinge.isVisible = false;
             } else {
                 mesh.checkCollisions = true;
             }
-            // console.log(mesh.name, "mon pôpa c'est ", mesh.parent?.name)
 
             if (mesh.name.match("porte.*")) { // || mesh.parent?.name === "portePause") {
                 //console.log(mesh.name, "mon pôpa c'est ", mesh.parent?.name);
@@ -90,40 +92,7 @@ class OfficeScene {
             }
 
 
-        });
-
-        /*
-
-        door.physicsImpostor = new PhysicsImpostor(door, PhysicsImpostor.BoxImpostor);
-
-        hinge.physicsImpostor = new PhysicsImpostor(hinge, PhysicsImpostor.CylinderImpostor);
-
-        let joint = new MotorEnabledJoint(
-            PhysicsJoint.HingeJoint,
-            {
-                mainPivot: new Vector3(0, 0, 0),
-                connectedPivot: new Vector3(0, -5, 0),
-                mainAxis: new Vector3(0, 1, 0),
-                connectedAxis: new Vector3(0, 1, 0),
-                nativeParams: {
-                }
-            }
-        );
-
-        console.log(joint);
-
-        hinge.physicsImpostor.addJoint(door.physicsImpostor, joint);
-
-        joint.setMotor(1);
-        */
-
-
-        //joint.physicsJoint
-
-        /*scene.registerBeforeRender(function () {
-            hinge.rotate(Axis.Y, 0.04);
-        })*/
-
+        });*/
 
         const chair = await SceneLoader.ImportMeshAsync(
             "",
@@ -226,15 +195,40 @@ class OfficeScene {
 
                     const raycastHit = scene.pickWithRay(ray);
 
+                    if (raycastHit.hit) {
+                        const item = getItemByName(raycastHit.pickedMesh.name);
+                        if (item) {
+                            // console.log(item.name, "ajouté à l'inventaire !");
+                            if (item instanceof PickableItem) {
+                                this._player.inventory.addItem(item);
+                                raycastHit.pickedMesh.dispose();
+                            } else {
+                                item.use(this._player.inventory.getSelectedItem());
+                            }
+                        }
+                    }
+                    /*
                     if (raycastHit.hit && raycastHit.pickedMesh.id === "chaise") {
                         console.log(raycastHit.pickedMesh.id, "ajouté à l'inventaire !");
-                        this._player.inventory.addItem(new Item(raycastHit.pickedMesh.id, "", "", ""));
+                        this._player.inventory.addItem(new PickableItem(raycastHit.pickedMesh.id));
                         raycastHit.pickedMesh.dispose();
                     }
+                    */
                 }
+
                 // open inventory
+                /*
                 if (kbInfo.event.key === "i") {
                     console.log(this._player.inventory.items.map((item) => item.name));
+                }
+                */
+
+                // 1 to 6 to select item
+                if (kbInfo.event.key.match(/[1-6]/)) {
+                    const index = parseInt(kbInfo.event.key) - 1;
+                    if (this._player.inventory.items[index]) {
+                        this._player.inventory.selectedItem = index;
+                    }
                 }
             }
         });

@@ -1,13 +1,21 @@
 import Door from "./Door";
-import Item from "./Item";
+import PickableItem from "./PickableItem";
 
-class Key extends Item {
+class Key extends PickableItem {
 
     private _door: Door;
 
-    constructor(name: string, description: string, modelPath: string, imagePath: string, door: Door) {
-        super(name, description, modelPath, imagePath);
+    constructor(name: string) {
+        super(name, "Clé de la porte : " + name.replace("clef", ""), "./images/key_" + name.replace("clef", "") + ".png");
+        this._door = undefined;
+    }
+
+    public set door(door: Door) {
         this._door = door;
+    }
+
+    public use(): void {
+        this._door.open(this);
     }
 }
 
