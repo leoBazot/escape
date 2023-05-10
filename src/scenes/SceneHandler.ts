@@ -53,7 +53,7 @@ class SceneHandler {
 
         this._currentScene.dispose();
 
-        engine.displayLoadingUI();
+        // engine.displayLoadingUI();
 
         var sceneString = "data:" + JSON.stringify(this._save);
         SceneLoader.Load("", sceneString, engine, this._onSceneLoaded);

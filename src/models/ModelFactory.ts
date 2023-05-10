@@ -5,27 +5,33 @@ import Item from "./Item";
 import Key from "./Key";
 import PickableItem from "./PickableItem";
 
-const creator = new Map<string, (name: string) => Item>;
+const creator = new Map<string, (mesh: AbstractMesh) => Item>;
 
-creator.set("porte*", (name: string) => {
-    return new Door(name);
+creator.set("porte*", (mesh: AbstractMesh) => {
+    return new Door(mesh.name);
 });
-creator.set("clef*", (name: string) => {
-    return new Key(name);
+creator.set("clef*", (mesh: AbstractMesh) => {
+    return new Key(mesh.name);
 });
-creator.set("pickable*", (name: string) => {
-    return new PickableItem(name);
+creator.set("pickable*", (mesh: AbstractMesh) => {
+    return new PickableItem(mesh.name);
 });
-creator.set("enigme*", (name: string) => {
-    return new Enigma(name);
+creator.set("enigme*", (mesh: AbstractMesh) => {
+    return new Enigma(mesh.name);
+});
+creator.set("hinge*", (mesh: AbstractMesh) => {
+    mesh.isVisible = false;
+    mesh.checkCollisions = false;
+    return undefined;
 });
 
 const database = new Map<string, Item>();
 
 function createItem(mesh: AbstractMesh): Item {
+    mesh.checkCollisions = true;
     for (const [key, func] of creator.entries()) {
         if (mesh.name.match(key)) {
-            return func(mesh.name);
+            return func(mesh);
         }
     }
     return undefined; // accessed on mesh wich can't be interacted with
