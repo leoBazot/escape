@@ -3,6 +3,7 @@ import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Matrix, Vector3 } from "@babylonjs/core/Maths/math";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
 import { Camera } from "@babylonjs/core/Cameras/camera";
@@ -17,6 +18,7 @@ import "@babylonjs/core/Physics/Plugins/cannonJSPlugin";
 
 
 import { Player } from "../models/Player";
+import Item from "../models/Item";
 import SceneHandler from "./SceneHandler";
 import PickableItem from "../models/PickableItem";
 import { createDatabase, getItemByName } from "../models/ModelFactory";
@@ -25,19 +27,17 @@ import { createDatabase, getItemByName } from "../models/ModelFactory";
 class OfficeScene {
 
     private _player: Player;
-    // private _database: Map<string, Item>;
+    private _database: Map<string, Item>;
 
     constructor() {
         this._player = new Player("Monkey", 6);
     }
 
 
-    public async createScene(engine: Engine) {
-        SceneHandler.instance.currentScene.detachControl();
-
-        SceneHandler.instance.currentScene.dispose();
-
+    public createScene(engine: Engine) {
         engine.displayLoadingUI();
+
+        SceneHandler.instance.currentScene.detachControl();
 
         let scene = new Scene(engine);
 
@@ -53,8 +53,6 @@ class OfficeScene {
 
         this.CreateRay(scene, camera);
 
-        this.createInventory(scene);
-
         scene.onPointerDown = (evt) => {
             // right click
             if (evt.button === 2) {
@@ -64,10 +62,6 @@ class OfficeScene {
             }
         };
 
-        await scene.whenReadyAsync();
-
-        scene.getEngine().hideLoadingUI();
-
         SceneHandler.instance.currentScene = scene;
     }
 
@@ -75,14 +69,11 @@ class OfficeScene {
         const room = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
-            "map.glb",
+            "salleTravailPorte.glb",
             scene
         );
 
         createDatabase(room.meshes);
-
-
-
         /*room.meshes.map((mesh) => {
 
             console.log(mesh.name);
@@ -103,7 +94,6 @@ class OfficeScene {
 
         });*/
 
-        /*
         const chair = await SceneLoader.ImportMeshAsync(
             "",
             "./models/furnitures/",
@@ -125,20 +115,20 @@ class OfficeScene {
                 });
             };
         });
-        */
+
     }
 
     CreateCamera(scene: Scene): FreeCamera {
-        const camera = new FreeCamera("camera", new Vector3(4, 3.95, -15), scene);
+        const camera = new FreeCamera("camera", new Vector3(-2, 2, -12), scene);
 
         camera.attachControl();
 
         camera.applyGravity = true;
         camera.checkCollisions = true;
 
-        camera.ellipsoid = new Vector3(0.5, 2, 0.5);
+        camera.ellipsoid = new Vector3(0.5, 1.5, 0.5);
 
-        camera.minZ = 0.4; // resolve clipping issue
+        camera.minZ = 0.50; // resolve clipping issue
         camera.speed = 0.3;
         camera.angularSensibility = 3200;
 
@@ -160,36 +150,6 @@ class OfficeScene {
         this.addCrosshair(scene, camera);
 
         return camera;
-    }
-
-    createInventory(scene: Scene) {
-        let w = 128
-
-        let texture = new DynamicTexture('inventory', 0, scene, false)
-        texture.hasAlpha = true
-        
-        let ctx = texture.getContext()
-
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
-        ctx.fillRect(0, 0, w, w)
-
-        texture.update()
-
-        let material = new StandardMaterial('inventory', scene)
-        material.diffuseTexture = texture
-        material.opacityTexture = texture
-        material.emissiveColor.set(0, 0, 0)
-        material.disableLighting = true
-
-        let plane = MeshBuilder.CreatePlane('inventory', { size: 0.2 }, scene)
-        plane.material = material
-        plane.position.set(0, 0, 1.1)
-        plane.isPickable = false
-
-        let inventory = plane
-        inventory.parent = scene.activeCamera
-
-        return inventory;
     }
 
     addCrosshair(scene: Scene, camera: Camera) {

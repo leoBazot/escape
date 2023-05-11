@@ -6,7 +6,6 @@ import { Vector3 } from "@babylonjs/core/Maths/math.vector";
 import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
 import { Button } from "@babylonjs/gui/2D/controls/button";
 import { Control } from "@babylonjs/gui/2D/controls/control";
-import { GameState } from "./GameState";
 
 async function createMenu(engine: Engine): Promise<Scene> {
     //load the start scene
@@ -31,7 +30,6 @@ async function createMenu(engine: Engine): Promise<Scene> {
 
     //this handles interactions with the start button attached to the scene
     startBtn.onPointerDownObservable.add(() => {
-        this._state = GameState.Play;
         this._displayGame();
     });
 

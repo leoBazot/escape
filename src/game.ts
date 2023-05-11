@@ -9,8 +9,12 @@ import { PlayerSettings, GameSettings } from "./Settings";
 import { Player } from "./models/Player";
 import SceneHandler from "./scenes/SceneHandler";
 import createMenuScene from "./scenes/MenuScene";
+import QuestionPopup from "./Question";
 
 window.CANNON = require("cannon");
+
+var _gameStarted = false;
+var questionMenu = new QuestionPopup();
 class Game {
 
     private _engine: Engine;
@@ -79,6 +83,7 @@ class Game {
         this._initSettings();
 
         await createMenuScene(this._engine);
+        _gameStarted = true;
 
         //resize if the screen is resized/rotated
         window.addEventListener('resize', () => {
@@ -90,5 +95,14 @@ class Game {
         });
     }
 }
+
+// Register a key event to trigger the pop-up screen
+window.addEventListener("keydown", function (event: KeyboardEvent) {
+    // Check if Game State is play and if question menu is currently opened
+    if (event.keyCode === 32 && !questionMenu.isMenuOpened && _gameStarted) { // Space key
+        questionMenu.show("Question ?", "Réponse correcte", "Réponse incorrecte"
+            , "Réponse incorrecte");
+    }
+});
 
 new Game();
