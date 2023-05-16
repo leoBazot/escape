@@ -10,7 +10,7 @@ const creator = new Map<string, (mesh: AbstractMesh) => Item>;
 creator.set("porte*", (mesh: AbstractMesh) => {
     return new Door(mesh.name);
 });
-creator.set("clef*", (mesh: AbstractMesh) => {
+creator.set("badge*", (mesh: AbstractMesh) => {
     return new Key(mesh.name);
 });
 creator.set("pickable*", (mesh: AbstractMesh) => {
@@ -34,7 +34,7 @@ function createItem(mesh: AbstractMesh): Item {
             return func(mesh);
         }
     }
-    return undefined; // accessed on mesh wich can't be interacted with
+    return undefined; // accessed on mesh wich can't be interacted with (ex: floor, walls, etc.)
 }
 
 function createDatabase(meshes: AbstractMesh[]): void {
@@ -44,19 +44,23 @@ function createDatabase(meshes: AbstractMesh[]): void {
             database.set(mesh.name, item);
         }
     }
+
+    for (const item of database.values()) {
+        if (item instanceof Key) {
+            setKeyToDoor(item);
+        }
+    }
 }
 
 function getItemByName(name: string): Item {
     return database.get(name);
 }
 
-function setKeyToDoor(keys: Key[]) {
-    for (const key of keys) {
-        const door = database.get(key.name.replace("clef", "porte"));
-        if (door) {
-            key.door = door as Door;
-            (door as Door).key = key;
-        }
+function setKeyToDoor(key: Key) {
+    const door = database.get(key.name.replace("badge", "porte"));
+    if (door) {
+        key.door = door as Door;
+        (door as Door).key = key;
     }
 }
 

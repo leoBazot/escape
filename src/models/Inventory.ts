@@ -1,10 +1,9 @@
 import { createInventoryFullError, InventoryFullError } from "../errors/InventoryErrors";
-import Item from "./Item";
+import PickableItem from "./PickableItem";
 
 class Inventory {
-
     private _capacity: number;
-    private _items: Item[];
+    private _items: PickableItem[];
     private _selectedItem: number;
 
     constructor(capacity: number) {
@@ -13,7 +12,7 @@ class Inventory {
         this._selectedItem = 0;
     }
 
-    public addItem(item: Item): InventoryFullError | void {
+    public addItem(item: PickableItem): InventoryFullError | void {
         if (this._capacity > this._items.length) {
             this._items.push(item);
         } else {
@@ -21,7 +20,7 @@ class Inventory {
         }
     }
 
-    public get items(): Item[] {
+    public get items(): PickableItem[] {
         return this._items;
     }
 
@@ -37,7 +36,7 @@ class Inventory {
         }
     }
 
-    public getItem(index: number): Item {
+    public getItem(index: number): PickableItem {
         return this._items[index];
     }
 
@@ -45,7 +44,7 @@ class Inventory {
         this._items.splice(index, 1);
     }
 
-    public getSelectedItem(): Item {
+    public getSelectedItem(): PickableItem {
         return this._items[this._selectedItem];
     }
 }

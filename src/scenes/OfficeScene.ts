@@ -9,6 +9,10 @@ import { Camera } from "@babylonjs/core/Cameras/camera";
 import { StandardMaterial } from "@babylonjs/core/Materials/standardMaterial";
 import { MeshBuilder } from "@babylonjs/core/Meshes/meshBuilder";
 import { KeyboardEventTypes } from "@babylonjs/core/Events/keyboardEvents";
+import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
+import { Image } from "@babylonjs/gui/2D/controls/image";
+import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
+import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
 
 import "@babylonjs/core/Physics/physicsEngineComponent";
 import "@babylonjs/core/Collisions/collisionCoordinator";
@@ -25,6 +29,7 @@ import { createDatabase, getItemByName } from "../models/ModelFactory";
 class OfficeScene {
 
     private _player: Player;
+    private _invetoryDisplay: AdvancedDynamicTexture;
     // private _database: Map<string, Item>;
 
     constructor() {
@@ -53,7 +58,7 @@ class OfficeScene {
 
         this.CreateRay(scene, camera);
 
-        this.createInventory(scene);
+        this.createInventory();
 
         scene.onPointerDown = (evt) => {
             // right click
@@ -81,51 +86,6 @@ class OfficeScene {
 
         createDatabase(room.meshes);
 
-
-
-        /*room.meshes.map((mesh) => {
-
-            console.log(mesh.name);
-
-            if (mesh.name.match("hinge.*")) {
-                hinge = mesh;
-                hinge.isVisible = false;
-            } else {
-                mesh.checkCollisions = true;
-            }
-
-            if (mesh.name.match("porte.*")) { // || mesh.parent?.name === "portePause") {
-                //console.log(mesh.name, "mon pôpa c'est ", mesh.parent?.name);
-                //mesh.rotate(new Vector3(0, 1, 0), Math.PI / 4, Space.WORLD);
-                door = mesh;
-            }
-
-
-        });*/
-
-        /*
-        const chair = await SceneLoader.ImportMeshAsync(
-            "",
-            "./models/furnitures/",
-            "chaise.glb",
-            scene,
-        );
-
-        chair.meshes.forEach((mesh) => {
-            mesh.scaling = new Vector3(0.08, 0.08, 0.08);
-            mesh.position = new Vector3(-2, 0, -3);
-            mesh.checkCollisions = true;
-
-            mesh.id = "chaise";
-            mesh.onDispose = () => {
-                chair.meshes.map((mesh) => {
-                    if (!mesh.isDisposed()) {
-                        mesh.dispose();
-                    }
-                });
-            };
-        });
-        */
     }
 
     CreateCamera(scene: Scene): FreeCamera {
@@ -162,34 +122,41 @@ class OfficeScene {
         return camera;
     }
 
-    createInventory(scene: Scene) {
-        let w = 128
+    createInventory() {
+        this._invetoryDisplay?.dispose();
 
-        let texture = new DynamicTexture('inventory', 0, scene, false)
-        texture.hasAlpha = true
-        
-        let ctx = texture.getContext()
+        const inventory = AdvancedDynamicTexture.CreateFullscreenUI("InventoryUI");
 
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
-        ctx.fillRect(0, 0, w, w)
+        const inventoryPanel = new StackPanel();
 
-        texture.update()
+        inventoryPanel.width = "80px";
+        inventoryPanel.left = "40%";
+        inventoryPanel.spacing = 20;
 
-        let material = new StandardMaterial('inventory', scene)
-        material.diffuseTexture = texture
-        material.opacityTexture = texture
-        material.emissiveColor.set(0, 0, 0)
-        material.disableLighting = true
+        for (let i = 0; i < 6; i++) {
 
-        let plane = MeshBuilder.CreatePlane('inventory', { size: 0.2 }, scene)
-        plane.material = material
-        plane.position.set(0, 0, 1.1)
-        plane.isPickable = false
+            const container = new Rectangle("container" + i);
+            container.width = "80px";
+            container.height = "80px";
+            container.background = "rgba(240, 240, 240, 0.5)"
+            container.thickness = 7;
+            container.color = "black";
+            container.cornerRadius = 10;
 
-        let inventory = plane
-        inventory.parent = scene.activeCamera
+            const item = new Image("item" + i, this._player.inventory.getItem(i)?.image);
 
-        return inventory;
+            item.stretch = Image.STRETCH_FILL;
+            item.color = "black";
+            item.width = "100%";
+            item.height = "100%";
+
+            container.addControl(item);
+            inventoryPanel.addControl(container);
+        }
+
+        inventory.addControl(inventoryPanel);
+
+        this._invetoryDisplay = inventory;
     }
 
     addCrosshair(scene: Scene, camera: Camera) {
@@ -231,37 +198,29 @@ class OfficeScene {
             if (kbInfo.type === KeyboardEventTypes.KEYUP) {
                 // pick up item
                 if (kbInfo.event.key === "e") {
-                    const ray = scene.createPickingRay(scene.pointerX, scene.pointerY, Matrix.Identity(), camera);
+                    // get screen center position
+                    var x = window.innerWidth / 2;
+                    var y = window.innerHeight / 2;
+
+                    const ray = scene.createPickingRay(x, y, Matrix.Identity(), camera);
 
                     const raycastHit = scene.pickWithRay(ray);
 
                     if (raycastHit.hit) {
+                        console.log(raycastHit.pickedMesh.name);
                         const item = getItemByName(raycastHit.pickedMesh.name);
+                        console.log(item?.name);
                         if (item) {
-                            // console.log(item.name, "ajouté à l'inventaire !");
                             if (item instanceof PickableItem) {
                                 this._player.inventory.addItem(item);
                                 raycastHit.pickedMesh.dispose();
+                                this.createInventory();
                             } else {
                                 item.use(this._player.inventory.getSelectedItem());
                             }
                         }
                     }
-                    /*
-                    if (raycastHit.hit && raycastHit.pickedMesh.id === "chaise") {
-                        console.log(raycastHit.pickedMesh.id, "ajouté à l'inventaire !");
-                        this._player.inventory.addItem(new PickableItem(raycastHit.pickedMesh.id));
-                        raycastHit.pickedMesh.dispose();
-                    }
-                    */
                 }
-
-                // open inventory
-                /*
-                if (kbInfo.event.key === "i") {
-                    console.log(this._player.inventory.items.map((item) => item.name));
-                }
-                */
 
                 // 1 to 6 to select item
                 if (kbInfo.event.key.match(/[1-6]/)) {

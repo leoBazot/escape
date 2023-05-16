@@ -25,14 +25,12 @@ async function createMenuScene(engine: Engine): Promise<void> {
 
     const guiMenu = AdvancedDynamicTexture.CreateFullscreenUI("UI");
     const startBtn = Button.CreateSimpleButton("start", "Jouer");
-    const logo = new Image("logo", "images/logo_sans_fond.jpg");
+    const logo = new Image("logo", "images/logo.png");
 
     logo.width = 0.5;
     logo.height = 0.5;
     logo.stretch = Image.STRETCH_UNIFORM;
     logo.top = "-15%";
-
-
 
     // css button style
     startBtn.width = 0.1;

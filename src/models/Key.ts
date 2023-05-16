@@ -6,7 +6,7 @@ class Key extends PickableItem {
     private _door: Door;
 
     constructor(name: string) {
-        super(name, "Clé de la porte : " + name.replace("clef", ""), "./images/key_" + name.replace("clef", "") + ".png");
+        super(name, "Clé de la porte : " + name.replace("badge", ""), "./images/pickable/" + name + ".png");
         this._door = undefined;
     }
 

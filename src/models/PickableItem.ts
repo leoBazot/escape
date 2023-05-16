@@ -5,7 +5,7 @@ class PickableItem extends Item {
 
     constructor(name: string, description?: string, imagePath?: string) {
         super(name, description);
-        if (imagePath) {
+        if (imagePath !== undefined) {
             this._imagePath = imagePath;
         } else {
             this._imagePath = "./images/" + name.replace("pickable", "") + ".png";
