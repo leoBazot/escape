@@ -24,13 +24,14 @@ import { Player } from "../models/Player";
 import SceneHandler from "./SceneHandler";
 import PickableItem from "../models/PickableItem";
 import { createDatabase, getItemByName } from "../models/ModelFactory";
+import DialogHandler from "../display/DialogHandler";
+import Dialog from "../display/Dialog";
 
 
 class OfficeScene {
 
     private _player: Player;
     private _invetoryDisplay: AdvancedDynamicTexture;
-    // private _database: Map<string, Item>;
 
     constructor() {
         this._player = new Player("Monkey", 6);
@@ -59,6 +60,10 @@ class OfficeScene {
         this.CreateRay(scene, camera);
 
         this.createInventory();
+
+        let d = new Dialog("test", "Je suis un super texte à peine long mais vraiment pas trop quoi, juste ce qu'il faut. Mon but ? Permetre de tester la gestion des retour à la ligne car si se problème n'est pas automatiquement résolu par babylonjs mon envie de vivre en sera considérablement réduite. Ce qui serait domage non, personne n'a envie que je sois triste ? ... pitiez répondezzzzz moiiiiiiiii ! (promis je ne suis pas trop fou)");
+
+        DialogHandler.instance.addDialog(d);
 
         scene.onPointerDown = (evt) => {
             // right click
@@ -98,7 +103,7 @@ class OfficeScene {
 
         camera.ellipsoid = new Vector3(0.5, 2, 0.5);
 
-        camera.minZ = 0.4; // resolve clipping issue
+        camera.minZ = 0.2; // resolve clipping issue
         camera.speed = 0.3;
         camera.angularSensibility = 3200;
 
@@ -131,6 +136,7 @@ class OfficeScene {
 
         inventoryPanel.width = "80px";
         inventoryPanel.left = "40%";
+        inventoryPanel.top = "-7%";
         inventoryPanel.spacing = 20;
 
         for (let i = 0; i < 6; i++) {
@@ -139,8 +145,13 @@ class OfficeScene {
             container.width = "80px";
             container.height = "80px";
             container.background = "rgba(240, 240, 240, 0.5)"
-            container.thickness = 7;
-            container.color = "black";
+            if (i === this._player.inventory.selectedItem) {
+                container.thickness = 5;
+                container.color = "white"
+            } else {
+                container.color = "black";
+                container.thickness = 4;
+            }
             container.cornerRadius = 10;
 
             const item = new Image("item" + i, this._player.inventory.getItem(i)?.image);
@@ -209,14 +220,17 @@ class OfficeScene {
                     if (raycastHit.hit) {
                         console.log(raycastHit.pickedMesh.name);
                         const item = getItemByName(raycastHit.pickedMesh.name);
-                        console.log(item?.name);
+                        console.log(item?.mesh);
                         if (item) {
                             if (item instanceof PickableItem) {
                                 this._player.inventory.addItem(item);
                                 raycastHit.pickedMesh.dispose();
                                 this.createInventory();
                             } else {
-                                item.use(this._player.inventory.getSelectedItem());
+                                if (item.use(this._player.inventory.getSelectedItem())) {
+                                    this._player.inventory.removeItem(this._player.inventory.selectedItem);
+                                    this.createInventory();
+                                }
                             }
                         }
                     }
@@ -225,9 +239,15 @@ class OfficeScene {
                 // 1 to 6 to select item
                 if (kbInfo.event.key.match(/[1-6]/)) {
                     const index = parseInt(kbInfo.event.key) - 1;
-                    if (this._player.inventory.items[index]) {
+                    if (0 <= index && index < this._player.inventory.capacity) {
                         this._player.inventory.selectedItem = index;
+                        this.createInventory();
                     }
+                }
+
+                // space to next dialog
+                if (kbInfo.event.key === " ") {
+                    DialogHandler.instance.showNextDialog();
                 }
             }
         });

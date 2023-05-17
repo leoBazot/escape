@@ -29,7 +29,7 @@ class Inventory {
     }
 
     public set selectedItem(index: number) {
-        if (index >= 0 && index < this._items.length) {
+        if (index >= 0 && index < this._capacity) {
             this._selectedItem = index;
         } else {
             throw new Error("Inventory : Index out of bounds");
@@ -46,6 +46,10 @@ class Inventory {
 
     public getSelectedItem(): PickableItem {
         return this._items[this._selectedItem];
+    }
+
+    public get selectedItem(): number {
+        return this._selectedItem;
     }
 }
 

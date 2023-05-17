@@ -1,3 +1,4 @@
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import { WrongKeyError, createWrongKeyError } from "../errors/DoorErrors";
 import Item from "./Item";
 import Key from "./Key";
@@ -7,8 +8,8 @@ class Door extends Item {
     private _isLocked: boolean;
     private _key: Key;
 
-    constructor(name: string) {
-        super(name, "Porte de la salle : " + name.replace("porte", ""));
+    constructor(mesh: AbstractMesh, name: string) {
+        super(mesh, name, "Porte de la salle : " + name.replace("porte", ""));
         this._isLocked = true;
         this._key = undefined;
     }
@@ -21,17 +22,18 @@ class Door extends Item {
         this._key = key;
     }
 
-    public open(key: Key): WrongKeyError | void {
-        if (key.equals(this._key)) {
+    public open(key: Key): boolean {
+        if (key?.equals(this._key)) {
             this._isLocked = false;
             this._mesh.dispose();
+            return true
         } else {
-            return createWrongKeyError(this);
+            return false;
         }
     }
 
-    public use(mesh?: Item): void {
-        this.open(this._key);
+    public use(mesh?: Item): boolean {
+        return this.open(mesh as Key);
     }
 }
 

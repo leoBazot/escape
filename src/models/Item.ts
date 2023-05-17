@@ -6,9 +6,14 @@ abstract class Item {
     private _description: string;
 
 
-    constructor(name: string, description: string) {
+    constructor(mesh: AbstractMesh, name: string, description: string) {
+        this._mesh = mesh;
         this._name = name;
         this._description = description;
+    }
+
+    public get mesh(): AbstractMesh {
+        return this._mesh;
     }
 
     public get name(): string {
@@ -20,10 +25,10 @@ abstract class Item {
     }
 
     public equals(item: Item): boolean {
-        return this._mesh === item._mesh;
+        return this._mesh === item?._mesh;
     }
 
-    public abstract use(mesh?: Item): void;
+    public abstract use(mesh?: Item): boolean;
 }
 
 export default Item;

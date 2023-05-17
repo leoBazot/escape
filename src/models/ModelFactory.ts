@@ -8,22 +8,28 @@ import PickableItem from "./PickableItem";
 const creator = new Map<string, (mesh: AbstractMesh) => Item>;
 
 creator.set("porte*", (mesh: AbstractMesh) => {
-    return new Door(mesh.name);
+    return new Door(mesh, mesh.name);
 });
 creator.set("badge*", (mesh: AbstractMesh) => {
-    return new Key(mesh.name);
+    return new Key(mesh, mesh.name);
 });
 creator.set("pickable*", (mesh: AbstractMesh) => {
-    return new PickableItem(mesh.name);
+    return new PickableItem(mesh, mesh.name);
 });
 creator.set("enigme*", (mesh: AbstractMesh) => {
-    return new Enigma(mesh.name);
+    return new Enigma(mesh, mesh.name);
 });
 creator.set("hinge*", (mesh: AbstractMesh) => {
     mesh.isVisible = false;
     mesh.checkCollisions = false;
     return undefined;
 });
+/*
+creator.set("Cube\\.*", (mesh: AbstractMesh) => {
+    mesh.isPickable = false;
+    return undefined;
+});
+*/
 
 const database = new Map<string, Item>();
 

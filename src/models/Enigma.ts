@@ -1,14 +1,15 @@
 import { Scene } from "@babylonjs/core/scene";
 import Item from "./Item";
 import SceneHandler from "../scenes/SceneHandler";
+import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 
 class Enigma extends Item {
     private _isSolved: boolean;
     private _item: Item; // item needed to start the enigma
     private _scene: Scene;
 
-    constructor(name: string) {
-        super(name, "Enigme : " + name.replace("enigme", ""));
+    constructor(mesh: AbstractMesh, name: string) {
+        super(mesh, name, "Enigme : " + name.replace("enigme", ""));
         this._isSolved = false;
     }
 
@@ -24,12 +25,11 @@ class Enigma extends Item {
         this._scene = scene;
     }
 
-    public use(mesh?: Item): void {
+    public use(mesh?: Item): boolean {
         if (mesh.equals(this._item)) {
-            SceneHandler.instance.saveScene();
-
-            SceneHandler.instance.currentScene = this._scene;
+            // TODO
         }
+        return false;
     }
 }
 
