@@ -9,7 +9,7 @@ class PickableItem extends Item {
         if (imagePath !== undefined) {
             this._imagePath = imagePath;
         } else {
-            this._imagePath = "./images/" + name.replace("pickable", "") + ".png";
+            this._imagePath = "./images/pickable/" + name.replace("pickable", "") + ".png";
         }
     }
 

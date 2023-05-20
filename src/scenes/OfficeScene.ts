@@ -18,12 +18,13 @@ import "@babylonjs/core/Physics/physicsEngineComponent";
 import "@babylonjs/core/Collisions/collisionCoordinator";
 import "@babylonjs/core/Culling/ray";
 import "@babylonjs/core/Physics/Plugins/cannonJSPlugin";
+import "@babylonjs/core/Animations/animatable";
 
 
 import { Player } from "../models/Player";
 import SceneHandler from "./SceneHandler";
 import PickableItem from "../models/PickableItem";
-import { createDatabase, getItemByName } from "../models/ModelFactory";
+import { createDatabase, getItemByName, postCreation, setKeystoDoors } from "../models/ModelFactory";
 import DialogHandler from "../display/DialogHandler";
 import Dialog from "../display/Dialog";
 
@@ -82,15 +83,72 @@ class OfficeScene {
     }
 
     async CreateEnvironment(scene: Scene): Promise<void> {
-        const room = await SceneLoader.ImportMeshAsync(
+        const salleTravail = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
-            "map.glb",
+            "salleTravail.glb",
             scene
         );
 
-        createDatabase(room.meshes);
+        const sallePause = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/rooms/",
+            "sallePause.glb",
+            scene
+        );
 
+        const boss = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/rooms/",
+            "boss.glb",
+            scene
+        );
+
+        const corridor = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/rooms/",
+            "corridor.glb",
+            scene
+        );
+
+        const reuBalais = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/rooms/",
+            "reuBalais.glb",
+            scene
+        );
+
+        const serveur = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/rooms/",
+            "serveur.glb",
+            scene
+        );
+
+        const toilettes = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/rooms/",
+            "toilettes.glb",
+            scene
+        );
+
+        createDatabase(salleTravail.meshes);
+
+        createDatabase(sallePause.meshes);
+
+        createDatabase(boss.meshes);
+
+        createDatabase(corridor.meshes);
+
+        createDatabase(reuBalais.meshes);
+
+        createDatabase(serveur.meshes);
+
+        createDatabase(toilettes.meshes);
+
+        setKeystoDoors();
+
+        postCreation();
     }
 
     CreateCamera(scene: Scene): FreeCamera {
@@ -208,7 +266,7 @@ class OfficeScene {
         scene.onPreKeyboardObservable.add((kbInfo) => {
             if (kbInfo.type === KeyboardEventTypes.KEYUP) {
                 // pick up item
-                if (kbInfo.event.key === "e") {
+                if (kbInfo.event.key === "e" || kbInfo.event.key === "E") {
                     // get screen center position
                     var x = window.innerWidth / 2;
                     var y = window.innerHeight / 2;
@@ -218,6 +276,7 @@ class OfficeScene {
                     const raycastHit = scene.pickWithRay(ray);
 
                     if (raycastHit.hit) {
+                        raycastHit.pickedMesh.dispose();
                         console.log(raycastHit.pickedMesh.name);
                         const item = getItemByName(raycastHit.pickedMesh.name);
                         console.log(item?.mesh);

@@ -50,12 +50,20 @@ function createDatabase(meshes: AbstractMesh[]): void {
             database.set(mesh.name, item);
         }
     }
+}
 
+function setKeystoDoors(): void {
     for (const item of database.values()) {
         if (item instanceof Key) {
             setKeyToDoor(item);
         }
     }
+}
+
+function postCreation(): void {
+    database.get("pickableCafePause_primitive1").mesh.parent = database.get("pickableCafePause_primitive0")?.mesh;
+    database.delete("pickableCafePause_primitive2");
+    database.delete("pickableCafePause_primitive3");
 }
 
 function getItemByName(name: string): Item {
@@ -70,4 +78,4 @@ function setKeyToDoor(key: Key) {
     }
 }
 
-export { createDatabase, getItemByName };
+export { createDatabase, getItemByName, setKeystoDoors, postCreation };

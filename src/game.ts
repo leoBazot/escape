@@ -65,16 +65,16 @@ class Game {
 
         // Create the engine with WebGPU support if available
         const webGPUSupported = await WebGPUEngine.IsSupportedAsync;
-        if (webGPUSupported) {
+        /*if (webGPUSupported) {
             const webgpu = this._engine = new WebGPUEngine(canvas, {
                 adaptToDeviceRatio: true,
                 antialias: true,
             });
             await webgpu.initAsync();
             this._engine = webgpu;
-        } else {
-            this._engine = new Engine(canvas, true);
-        }
+        } else {*/
+        this._engine = new Engine(canvas, true);
+        // }
 
         this._initSettings();
 
