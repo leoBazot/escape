@@ -9,6 +9,7 @@ import { PlayerSettings, GameSettings } from "./Settings";
 import { Player } from "./models/Player";
 import SceneHandler from "./scenes/SceneHandler";
 import createMenuScene from "./scenes/MenuScene";
+import OfficeScene from "./scenes/OfficeScene";
 
 window.CANNON = require("cannon");
 class Game {

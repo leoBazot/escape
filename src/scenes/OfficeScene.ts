@@ -1,7 +1,7 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { Matrix, Vector3 } from "@babylonjs/core/Maths/math";
+import { Color3, Matrix, Vector3 } from "@babylonjs/core/Maths/math";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
@@ -26,13 +26,16 @@ import SceneHandler from "./SceneHandler";
 import PickableItem from "../models/PickableItem";
 import { createDatabase, getItemByName, postCreation, setKeystoDoors } from "../models/ModelFactory";
 import DialogHandler from "../display/DialogHandler";
-import Dialog from "../display/Dialog";
+import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
+import { Mesh } from "@babylonjs/core/Meshes/mesh";
+import Enigma from "../models/Enigma";
 
 
 class OfficeScene {
 
     private _player: Player;
     private _invetoryDisplay: AdvancedDynamicTexture;
+    private _crosshair;
 
     constructor() {
         this._player = new Player("Monkey", 6);
@@ -61,10 +64,6 @@ class OfficeScene {
         this.CreateRay(scene, camera);
 
         this.createInventory();
-
-        let d = new Dialog("test", "Je suis un super texte à peine long mais vraiment pas trop quoi, juste ce qu'il faut. Mon but ? Permetre de tester la gestion des retour à la ligne car si se problème n'est pas automatiquement résolu par babylonjs mon envie de vivre en sera considérablement réduite. Ce qui serait domage non, personne n'a envie que je sois triste ? ... pitiez répondezzzzz moiiiiiiiii ! (promis je ne suis pas trop fou)");
-
-        DialogHandler.instance.addDialog(d);
 
         scene.onPointerDown = (evt) => {
             // right click
@@ -258,28 +257,56 @@ class OfficeScene {
 
         reticule = plane
         reticule.parent = camera
-        return reticule
+        this._crosshair = reticule
     }
 
     CreateRay(scene: Scene, camera: FreeCamera): void {
 
+        let highlight = new HighlightLayer("highlight", scene);
+
+        highlight.addExcludedMesh(this._crosshair);
+
+        let highlightFunc = () => {
+            // get screen center position
+            var x = window.innerWidth / 2;
+            var y = window.innerHeight / 2;
+
+            const ray = scene.createPickingRay(x, y, Matrix.Identity(), camera);
+
+            ray.length = 8;
+
+            const result = scene.pickWithRay(ray);
+            highlight.removeAllMeshes();
+            if (result.hit) {
+                let item = getItemByName(result.pickedMesh.name);
+
+                if (item instanceof PickableItem) {
+                    highlight.addMesh(item.mesh as Mesh, Color3.Green());
+                } else if (item instanceof Enigma) {
+                    highlight.addMesh(item.mesh as Mesh, new Color3(0.3, 0.3, 1));
+                }
+            }
+        }
+
         scene.onPreKeyboardObservable.add((kbInfo) => {
+            highlightFunc();
             if (kbInfo.type === KeyboardEventTypes.KEYUP) {
+                // get screen center position
+                var x = window.innerWidth / 2;
+                var y = window.innerHeight / 2;
+
+                const ray = scene.createPickingRay(x, y, Matrix.Identity(), camera);
+
+                ray.length = 8;
+
                 // pick up item
                 if (kbInfo.event.key === "e" || kbInfo.event.key === "E") {
-                    // get screen center position
-                    var x = window.innerWidth / 2;
-                    var y = window.innerHeight / 2;
-
-                    const ray = scene.createPickingRay(x, y, Matrix.Identity(), camera);
-
                     const raycastHit = scene.pickWithRay(ray);
 
                     if (raycastHit.hit) {
-                        raycastHit.pickedMesh.dispose();
                         console.log(raycastHit.pickedMesh.name);
                         const item = getItemByName(raycastHit.pickedMesh.name);
-                        console.log(item?.mesh);
+                        console.log(item);
                         if (item) {
                             if (item instanceof PickableItem) {
                                 this._player.inventory.addItem(item);
@@ -308,8 +335,11 @@ class OfficeScene {
                 if (kbInfo.event.key === " ") {
                     DialogHandler.instance.showNextDialog();
                 }
+
             }
         });
+
+        scene.onPointerMove = highlightFunc
     }
 }
 

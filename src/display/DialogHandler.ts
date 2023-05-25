@@ -21,6 +21,7 @@ class DialogHandler {
     public showNextDialog(): void {
         if (this._dialogs.length > 0) {
             this._dialogs[0]?.show();
+            this._currentDialog?.dispose();
             this._currentDialog = this._dialogs[0];
             this._dialogs.shift();
         } else {

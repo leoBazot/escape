@@ -4,32 +4,9 @@ import Enigma from "./Enigma";
 import Item from "./Item";
 import Key from "./Key";
 import PickableItem from "./PickableItem";
+import { getResolver } from "./EnigmaFactory";
 
 const creator = new Map<string, (mesh: AbstractMesh) => Item>;
-
-creator.set("porte*", (mesh: AbstractMesh) => {
-    return new Door(mesh, mesh.name);
-});
-creator.set("badge*", (mesh: AbstractMesh) => {
-    return new Key(mesh, mesh.name);
-});
-creator.set("pickable*", (mesh: AbstractMesh) => {
-    return new PickableItem(mesh, mesh.name);
-});
-creator.set("enigme*", (mesh: AbstractMesh) => {
-    return new Enigma(mesh, mesh.name);
-});
-creator.set("hinge*", (mesh: AbstractMesh) => {
-    mesh.isVisible = false;
-    mesh.checkCollisions = false;
-    return undefined;
-});
-/*
-creator.set("Cube\\.*", (mesh: AbstractMesh) => {
-    mesh.isPickable = false;
-    return undefined;
-});
-*/
 
 const database = new Map<string, Item>();
 
@@ -64,6 +41,8 @@ function postCreation(): void {
     database.get("pickableCafePause_primitive1").mesh.parent = database.get("pickableCafePause_primitive0")?.mesh;
     database.delete("pickableCafePause_primitive2");
     database.delete("pickableCafePause_primitive3");
+
+    database.delete("enigmeporte2Elec");
 }
 
 function getItemByName(name: string): Item {
@@ -77,5 +56,30 @@ function setKeyToDoor(key: Key) {
         (door as Door).key = key;
     }
 }
+
+function _onSuccesCreator(id: string, onSucces: () => void): () => void {
+    return () => {
+        onSucces();
+        database.delete(id);
+    };
+}
+
+creator.set("\^porte*", (mesh: AbstractMesh) => {
+    return new Door(mesh, mesh.name);
+});
+creator.set("\^badge*", (mesh: AbstractMesh) => {
+    return new Key(mesh, mesh.name);
+});
+creator.set("\^pickable*", (mesh: AbstractMesh) => {
+    return new PickableItem(mesh, mesh.name);
+});
+creator.set("\^enigme*", (mesh: AbstractMesh) => {
+    return new Enigma(mesh, mesh.name, _onSuccesCreator(mesh.name, getResolver(mesh.name)));
+});
+creator.set("\^hinge*", (mesh: AbstractMesh) => {
+    mesh.isVisible = false;
+    mesh.checkCollisions = false;
+    return undefined;
+});
 
 export { createDatabase, getItemByName, setKeystoDoors, postCreation };
