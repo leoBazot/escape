@@ -10,10 +10,128 @@
     <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
     <meta charset="UTF-8">
     <title>Escape</title>
-    <script defer="defer" src="escape.js"></script>
+    <style>
+        #loadingScreen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            font-size: 50px;
+            text-align: center;
+            background-color: rgb(25, 25, 25);
+            z-index: 9999;
+            display: none;
+            flex-direction: column;
+        }
+
+        #texteIntro {
+            color: rgb(190, 190, 190);
+            height: 100vh;
+            justify-content: center;
+            align-items: center;
+            display: flex;
+            padding-left: 8%;
+            padding-right: 8%;
+            border: 1 solid blue;
+        }
+
+
+        .loadingAnim {
+            padding-left: 72%;
+            padding-bottom: 3%;
+            display: flex;
+            background: rgb(25, 25, 25);
+        }
+
+        .wave {
+            width: 5px;
+            height: 80px;
+            background: linear-gradient(45deg, cyan, #fff);
+            margin: 10px;
+            animation: wave 1s linear infinite;
+            border-radius: 20px;
+        }
+
+        .wave:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .wave:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .wave:nth-child(4) {
+            animation-delay: 0.3s;
+        }
+
+        .wave:nth-child(5) {
+            animation-delay: 0.4s;
+        }
+
+        .wave:nth-child(6) {
+            animation-delay: 0.5s;
+        }
+
+        .wave:nth-child(7) {
+            animation-delay: 0.6s;
+        }
+
+        .wave:nth-child(8) {
+            animation-delay: 0.7s;
+        }
+
+        .wave:nth-child(9) {
+            animation-delay: 0.8s;
+        }
+
+        .wave:nth-child(10) {
+            animation-delay: 0.9s;
+        }
+
+        @keyframes wave {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1);
+            }
+
+            100% {
+                transform: scale(0);
+            }
+        }
+    </style>
 </head>
 
 <body>
+    <div id="loadingScreen">
+        <div id="texteIntro">
+            Bienvenue dans EscApe,
+            où de l’ombre à la lumière il n’y a que des énigmes !
+            <br />
+            Au sein de cette entreprise dystopique
+            vous allez devoir vous enfuir, en résolvant des énigmes.
+            <!--
+            <br />
+            Vous incarnez un personnage mystérieux qui ne cessera d’évoluer tout au long du jeu.
+            -->
+            <br />
+            Seuls les enquêteurs les plus chevronnés réussiront à s'échapper de l’entreprise et découvriront qui ils
+            sont vraiment.
+        </div>
+        <div class="loadingAnim">
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+            <div class="wave"></div>
+        </div>
+    </div>
 </body>
 
 </html>
