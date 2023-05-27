@@ -146,7 +146,7 @@ class EnigmaHandler {
         background.height = 0.6;
         background.cornerRadius = 10;
 
-        const answer = new TextBlock("answaer", ans);
+        const answer = new TextBlock("answer", ans);
 
         answer.color = "black";
         answer.fontSize = 25;

@@ -28,6 +28,7 @@ import DialogHandler from "../display/DialogHandler";
 import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import Enigma from "../models/Enigma";
+import { EscapeLoadingScreen } from "../display/EscapeLoadingScreen";
 
 class OfficeScene {
 
@@ -44,6 +45,8 @@ class OfficeScene {
         SceneHandler.instance.currentScene.detachControl();
 
         SceneHandler.instance.currentScene.dispose();
+
+        engine.loadingScreen = new EscapeLoadingScreen();
 
         engine.displayLoadingUI();
 
