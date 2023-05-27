@@ -20,7 +20,6 @@ import "@babylonjs/core/Culling/ray";
 import "@babylonjs/core/Physics/Plugins/cannonJSPlugin";
 import "@babylonjs/core/Animations/animatable";
 
-
 import { Player } from "../models/Player";
 import SceneHandler from "./SceneHandler";
 import PickableItem from "../models/PickableItem";
@@ -29,7 +28,6 @@ import DialogHandler from "../display/DialogHandler";
 import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import Enigma from "../models/Enigma";
-
 
 class OfficeScene {
 
@@ -73,6 +71,8 @@ class OfficeScene {
                 }
             }
         };
+
+        this.createText(scene);
 
         await scene.whenReadyAsync();
 
@@ -340,6 +340,26 @@ class OfficeScene {
         });
 
         scene.onPointerMove = highlightFunc
+    }
+
+    public async createText(scene: Scene) {
+        const fontData = await (await fetch("./fonts/Droid Sans_Regular.json")).json(); // Providing you have a font data file at that location
+
+        //color
+        const textColor = new StandardMaterial("groundMat");
+        textColor.diffuseColor = Color3.White();
+
+        const texteSalleDePause = MeshBuilder.CreateText("myText", "Salle de pause", fontData, {
+            size: 0.2,
+            resolution: 64,
+            depth: 0.1
+        }, scene);
+
+        texteSalleDePause.position = new Vector3(-7.5, 5.3, 6.7);
+        texteSalleDePause.rotation = new Vector3(0, Math.PI * 3 / 2, 0);
+        texteSalleDePause.material = textColor;
+
+        // TODO salle serveur, salle réunion, salle du boss
     }
 }
 

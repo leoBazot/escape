@@ -12,6 +12,7 @@ import createMenuScene from "./scenes/MenuScene";
 import OfficeScene from "./scenes/OfficeScene";
 
 window.CANNON = require("cannon");
+
 class Game {
 
     private _engine: Engine;
