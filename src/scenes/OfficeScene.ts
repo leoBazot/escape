@@ -30,6 +30,7 @@ import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import Enigma from "../models/Enigma";
 import { EscapeLoadingScreen } from "../display/EscapeLoadingScreen";
 import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
+import LightHandler from "../display/LightHandler";
 
 class OfficeScene {
 
@@ -53,7 +54,7 @@ class OfficeScene {
 
         let scene = new Scene(engine);
 
-        var light1: HemisphericLight = new HemisphericLight("light1", new Vector3(1, 1, 0), scene);
+        LightHandler.setInstance(scene);
 
         scene.enablePhysics();
 
@@ -135,6 +136,10 @@ class OfficeScene {
             scene
         );
 
+        salleTravail.lights.forEach((light) => {
+            light.intensity = 0.5;
+        });
+
         createDatabase(salleTravail.meshes);
 
         createDatabase(sallePause.meshes);
@@ -168,16 +173,24 @@ class OfficeScene {
         camera.speed = 0.3;
         camera.angularSensibility = 3200;
 
+        // remove default key bindings
+        camera.keysUp = [];
+        camera.keysLeft = [];
+        camera.keysDown = [];
+        camera.keysRight = [];
+        camera.keysUpward = [];
+        camera.keysDownward = [];
+
         // zqsd
-        camera.keysUp.push(90);
+        camera.keysUpward.push(90);
         camera.keysLeft.push(81);
-        camera.keysDown.push(83);
+        camera.keysDownward.push(83);
         camera.keysRight.push(68);
 
         // arrow keys
-        camera.keysUp.push(38);
+        camera.keysUpward.push(38);
         camera.keysLeft.push(37);
-        camera.keysDown.push(40);
+        camera.keysDownward.push(40);
         camera.keysRight.push(39);
 
         // jump on space
@@ -301,11 +314,13 @@ class OfficeScene {
 
                 const ray = scene.createPickingRay(x, y, Matrix.Identity(), camera);
 
-                ray.length = 8;
+                // ray.length = 8;
 
                 // pick up item
                 if (kbInfo.event.key === "e" || kbInfo.event.key === "E") {
                     const raycastHit = scene.pickWithRay(ray);
+
+                    console.log(raycastHit.pickedMesh.name);
 
                     if (raycastHit.hit) {
                         const item = getItemByName(raycastHit.pickedMesh.name);
@@ -349,7 +364,7 @@ class OfficeScene {
         const fontData = await (await fetch("./fonts/Droid Sans_Regular.json")).json(); // Providing you have a font data file at that location
 
         //color
-        const textColor = new StandardMaterial("groundMat");
+        const textColor = new StandardMaterial("textColor", scene);
         // textColor.diffuseColor = Color3.White();
         textColor.emissiveColor = Color3.White();
         textColor.alpha = 0.8;

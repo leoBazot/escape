@@ -1,10 +1,12 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
+
 import Door from "./Door";
 import Enigma from "./Enigma";
 import Item from "./Item";
 import Key from "./Key";
 import PickableItem from "./PickableItem";
 import { getResolver } from "./EnigmaFactory";
+import LightHandler from "../display/LightHandler";
 
 const creator = new Map<string, (mesh: AbstractMesh) => Item>;
 
@@ -43,6 +45,8 @@ function postCreation(): void {
     database.delete("pickableCafePause_primitive3");
 
     database.delete("enigmeporte2Elec");
+
+    LightHandler.instance.lightsOff();
 }
 
 function getItemByName(name: string): Item {
@@ -79,6 +83,10 @@ creator.set("\^enigme*", (mesh: AbstractMesh) => {
 creator.set("\^hinge*", (mesh: AbstractMesh) => {
     mesh.isVisible = false;
     mesh.checkCollisions = false;
+    return undefined;
+});
+creator.set("\^lumiere*", (mesh: AbstractMesh) => {
+    LightHandler.instance.addLightMesh(mesh);
     return undefined;
 });
 
