@@ -29,6 +29,7 @@ import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import Enigma from "../models/Enigma";
 import { EscapeLoadingScreen } from "../display/EscapeLoadingScreen";
+import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
 
 class OfficeScene {
 
@@ -307,9 +308,8 @@ class OfficeScene {
                     const raycastHit = scene.pickWithRay(ray);
 
                     if (raycastHit.hit) {
-                        console.log(raycastHit.pickedMesh.name);
                         const item = getItemByName(raycastHit.pickedMesh.name);
-                        console.log(item);
+
                         if (item) {
                             if (item instanceof PickableItem) {
                                 this._player.inventory.addItem(item);
@@ -350,19 +350,52 @@ class OfficeScene {
 
         //color
         const textColor = new StandardMaterial("groundMat");
-        textColor.diffuseColor = Color3.White();
+        // textColor.diffuseColor = Color3.White();
+        textColor.emissiveColor = Color3.White();
+        textColor.alpha = 0.8;
 
-        const texteSalleDePause = MeshBuilder.CreateText("myText", "Salle de pause", fontData, {
+        const texteSalleDePause = MeshBuilder.CreateText("txtSallePause", "Salle de pause", fontData, {
             size: 0.2,
             resolution: 64,
             depth: 0.1
         }, scene);
 
-        texteSalleDePause.position = new Vector3(-7.5, 5.3, 6.7);
+        texteSalleDePause.position = new Vector3(-7.55, 5.3, 6.7);
         texteSalleDePause.rotation = new Vector3(0, Math.PI * 3 / 2, 0);
         texteSalleDePause.material = textColor;
 
         // TODO salle serveur, salle réunion, salle du boss
+
+        const texteSalleServeur = MeshBuilder.CreateText("txtSalleServeur", "Salle serveur", fontData, {
+            size: 0.2,
+            resolution: 64,
+            depth: 0.1
+        }, scene);
+
+        texteSalleServeur.position = new Vector3(41.12, 5.3, 11.77);
+        texteSalleServeur.material = textColor;
+
+        const texteSalleReu = MeshBuilder.CreateText("txtSalleReu", "Salle de réunion", fontData, {
+            size: 0.2,
+            resolution: 64,
+            depth: 0.1
+        }, scene);
+
+        texteSalleReu.position = new Vector3(45.9, 5.3, 2.5);
+        texteSalleReu.rotation = new Vector3(0, Math.PI, 0);
+        texteSalleReu.material = textColor;
+
+        const TexteSalleBoss = MeshBuilder.CreateText("txtSalleBoss", "Bureau du directeur", fontData, {
+            size: 0.2,
+            resolution: 64,
+            depth: 0.1
+        }, scene);
+
+        TexteSalleBoss.position = new Vector3(51.6, 5.3, 7.2);
+        TexteSalleBoss.rotation = new Vector3(0, Math.PI / 2, 0);
+        TexteSalleBoss.material = textColor;
+
+
     }
 }
 
