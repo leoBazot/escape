@@ -1,5 +1,6 @@
 import Dialog from "../display/Dialog";
 import DialogHandler from "../display/DialogHandler";
+import LightHandler from "../display/LightHandler";
 
 // fonction pour les enigmes en cours de création
 let wip = () => {
@@ -22,10 +23,14 @@ let dialogExample = () => {
     // les dialogues suivants s'afficheront automatiquement quand l'utilisateur appuyras sur la touche espace
 }
 
+let enigmePanneauElec = () => {
+    LightHandler.instance.lightsOn();
+}
+
 let resolver: Map<string, () => void> = new Map<string, () => void>();
 
 // TODO changer la fonction de résolution pou rallumer les lumières
-resolver.set("enigmeporteArmoire", dialogExample);
+resolver.set("enigmeporteArmoire", enigmePanneauElec);
 
 function getResolver(name: string): () => void {
     return resolver.get(name) || wip;

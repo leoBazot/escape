@@ -158,7 +158,7 @@ class EnigmaHandler {
         setTimeout(() => {
             this.dispose();
             this._isSolved = false;
-        }, 2000);
+        }, 1000);
     }
 
     private _onSucces(): void {
