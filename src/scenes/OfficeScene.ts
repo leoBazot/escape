@@ -183,14 +183,18 @@ class OfficeScene {
 
         // zqsd
         camera.keysUpward.push(90);
+        camera.keysUp.push(90);
         camera.keysLeft.push(81);
         camera.keysDownward.push(83);
+        camera.keysDown.push(83);
         camera.keysRight.push(68);
 
         // arrow keys
         camera.keysUpward.push(38);
+        camera.keysUp.push(38);
         camera.keysLeft.push(37);
         camera.keysDownward.push(40);
+        camera.keysDown.push(40);
         camera.keysRight.push(39);
 
         // jump on space
