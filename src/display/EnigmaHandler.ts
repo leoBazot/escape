@@ -1,14 +1,14 @@
-import { AdvancedDynamicTexture } from "@babylonjs/gui/2D/advancedDynamicTexture";
-import { Rectangle } from "@babylonjs/gui/2D/controls/rectangle";
-import { TextBlock } from "@babylonjs/gui/2D/controls/textBlock";
-import { StackPanel } from "@babylonjs/gui/2D/controls/stackPanel";
-import { Button } from "@babylonjs/gui/2D/controls/button";
+import {AdvancedDynamicTexture} from "@babylonjs/gui/2D/advancedDynamicTexture";
+import {Rectangle} from "@babylonjs/gui/2D/controls/rectangle";
+import {TextBlock} from "@babylonjs/gui/2D/controls/textBlock";
+import {StackPanel} from "@babylonjs/gui/2D/controls/stackPanel";
+import {Button} from "@babylonjs/gui/2D/controls/button";
 
 import Enigma from "../models/Enigma";
 import SceneHandler from "../scenes/SceneHandler";
 import DialogHandler from "./DialogHandler";
 import Dialog from "./Dialog";
-import { getItemByName } from "../models/ModelFactory";
+import {getItemByName} from "../models/ModelFactory";
 
 class EnigmaDisplay {
     private _question: string;
@@ -41,11 +41,25 @@ const questionDB: Map<string, EnigmaDisplay[]> = new Map<string, EnigmaDisplay[]
 
 // TODO finish connection to this
 // Q1 = https://www.edf.fr/groupe-edf/espaces-dedies/l-energie-de-a-a-z/tout-sur-l-energie/l-electricite-au-quotidien/la-consommation-d-electricite-en-chiffres
-questionDB.set("enigmeporteArmoire", [new EnigmaDisplay("Quel était la part de consomation d'electricité des entreprises françaises en 2019 ? ", ["27%", "44%", "64%"], 1)
+questionDB.set("enigmeporteArmoire", [new EnigmaDisplay("Quelle était la part de consommation d'électricité des entreprises françaises en 2019 ?", ["27%", "44%", "64%"], 1)
     // Q2 = https://www.statistiques.developpement-durable.gouv.fr/chiffres-cles-de-lenergie-edition-2022-0
-    , new EnigmaDisplay("Quel étais la proportion d'énergie renouvelable produite en france en 2021", ["13%", "18%", "24%"], 3)
+    , new EnigmaDisplay("Quelle était la proportion d'énergie renouvelable produite en France en 2021", ["13%", "18%", "24%"], 3)
     // Q3 = https://www.statistiques.developpement-durable.gouv.fr/chiffres-cles-des-energies-renouvelables-edition-2021
-    , new EnigmaDisplay("Quel étais la part d'énergie renouvelable dans la consomation d'énergie en france en 2021 ?", ["18,7%", "19,1%", "33%"], 2)]);
+    , new EnigmaDisplay("Quelle était la part d'énergie renouvelable dans la consommation d'énergie en France en 2021 ?", ["18,7%", "19,1%", "33%"], 2),
+    // Q4 Réparer le panneau électrique
+    , new EnigmaDisplay("Comment une entreprise peut-elle réduire sa consommation d'électricité ?", ["En installant des capteurs de présence pour réguler l'éclairage et la climatisation", "En utilisant des appareils électroniques moins économes en énergie ", "En laissant les lumières allumées dans les zones de travail non utilisées"], 1)
+    // Q5 Réparer la machine à café
+    , new EnigmaDisplay("Quels sont les avantages de l'utilisation de café équitable pour les entreprises au-delà de l'amélioration de leur image de marque ? ", ["Une amélioration des conditions de travail et des relations avec les fournisseurs", "Une réduction des coûts de production", "Une augmentation des ventes"], 1)
+    // Q6 Déverrouiller la salle de pause
+    , new EnigmaDisplay("Comment l'utilisation des salles de pause peut-elle être bénéfique pour l'environnement ?", ["En réduisant les déchets alimentaires grâce à l'utilisation de vaisselle réutilisable ", "En réduisant l'utilisation de la climatisation dans les bureaux", "En encourageant les employés à prendre les transports en commun pour aller travailler"], 1)
+    // Q7 Remettre l'éelectricité en reconnectant les panneaux photovoltaïques
+    , new EnigmaDisplay("Comment l'efficacité énergétique peut-elle contribuer à la RSE ? ", ["En réduisant la consommation d'énergie et donc les émissions de gaz à effet de serre ", "En augmentant la consommation d'énergie fossile pour augmenter la production ", "En augmentant les coûts de production de l'entreprise"], 1)
+    // Q8 Ramasser 2 objets pour enlever la rouille
+    , new EnigmaDisplay("Pourquoi l'utilisation de produits chimiques dispensables peut-elle être préjudiciable à la RSE ?", ["Parce que ces produits peuvent avoir un impact négatif sur l'environnement ", "Parce que ces produits peuvent être dangereux pour la santé des travailleurs, même dans le respect des normes établies", "Parce que ces produits peuvent être coûteux pour l'entreprise"], 1)
+    // Q9 Réveiller Steve pour accéder au fumoir
+    , new EnigmaDisplay("Quelles sont les conséquences possibles pour une entreprise qui ne gère pas correctement les mégots de cigarettes sur son lieu de travail ?", ["Amende pour non-respect des normes environnementales", "Perte de productivité des employés", "Réduction de la satisfaction des employés en raison de la mauvaise gestion des déchets"], 1)
+    // Q10 Transformer la salle de fumoir en salle végétale
+    , new EnigmaDisplay("Comment l'entreprise peut-elle impliquer les employés dans le processus de transformation de l'ancien fumoir en une autre pièce ?", ["En organisant des groupes de travail pour identifier les besoins des employés en matière de nouvelles pièces", "En ne prenant en compte que son profit", "En proposant un vote aux employés pour décider de la nouvelle pièce"], 1)]);
 
 class EnigmaHandler {
     private _isSolved: boolean;
@@ -172,5 +186,4 @@ class EnigmaHandler {
 }
 
 
-
-export { EnigmaHandler, EnigmaDisplay };
+export {EnigmaHandler, EnigmaDisplay};

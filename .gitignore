@@ -3,3 +3,9 @@ dist
 
 # to avoid any mistakes
 *.zip
+/.idea/.gitignore
+/.idea/escape.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
