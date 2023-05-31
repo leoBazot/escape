@@ -28,7 +28,7 @@ class Enigma extends Item {
     }
 
     public use(mesh?: Item): boolean {
-        if (!this._item || mesh.equals(this._item)) {
+        if (!this._item || this._item.equals(mesh)) {
             SceneHandler.instance.currentScene.getEngine().exitPointerlock();
             EnigmaHandler.instance.showEnigma(this);
         }
