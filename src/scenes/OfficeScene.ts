@@ -94,12 +94,16 @@ class OfficeScene {
             scene
         );
 
+        createDatabase(salleTravail.meshes);
+
         const sallePause = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
             "sallePause.glb",
             scene
         );
+
+        createDatabase(sallePause.meshes);
 
         const boss = await SceneLoader.ImportMeshAsync(
             "",
@@ -108,12 +112,16 @@ class OfficeScene {
             scene
         );
 
+        createDatabase(boss.meshes);
+
         const corridor = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
             "corridor.glb",
             scene
         );
+
+        createDatabase(corridor.meshes);
 
         const reuBalais = await SceneLoader.ImportMeshAsync(
             "",
@@ -122,12 +130,16 @@ class OfficeScene {
             scene
         );
 
+        createDatabase(reuBalais.meshes);
+
         const serveur = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
             "serveur.glb",
             scene
         );
+
+        createDatabase(serveur.meshes);
 
         const toilettes = await SceneLoader.ImportMeshAsync(
             "",
@@ -136,6 +148,8 @@ class OfficeScene {
             scene
         );
 
+        createDatabase(toilettes.meshes);
+
         const steveDodo = await SceneLoader.ImportMeshAsync(
             "",
             "./models/characters/",
@@ -143,28 +157,14 @@ class OfficeScene {
             scene
         );
 
+        createDatabase(steveDodo.meshes);
+
         const steveBalais = await SceneLoader.ImportMeshAsync(
             "",
             "./models/characters/",
             "steveBalais.glb",
             scene
         );
-
-        createDatabase(salleTravail.meshes);
-
-        createDatabase(sallePause.meshes);
-
-        createDatabase(boss.meshes);
-
-        createDatabase(corridor.meshes);
-
-        createDatabase(reuBalais.meshes);
-
-        createDatabase(serveur.meshes);
-
-        createDatabase(toilettes.meshes);
-
-        createDatabase(steveDodo.meshes);
 
         createDatabase(steveBalais.meshes);
 
@@ -377,11 +377,10 @@ class OfficeScene {
     }
 
     public async createText(scene: Scene) {
-        const fontData = await (await fetch("./fonts/Droid Sans_Regular.json")).json(); // Providing you have a font data file at that location
+        const fontData = await (await fetch("./fonts/Droid Sans_Regular.json")).json();
 
         //color
         const textColor = new StandardMaterial("textColor", scene);
-        // textColor.diffuseColor = Color3.White();
         textColor.emissiveColor = Color3.White();
         textColor.alpha = 0.8;
 
@@ -394,8 +393,6 @@ class OfficeScene {
         texteSalleDePause.position = new Vector3(-7.55, 5.3, 6.7);
         texteSalleDePause.rotation = new Vector3(0, Math.PI * 3 / 2, 0);
         texteSalleDePause.material = textColor;
-
-        // TODO salle serveur, salle réunion, salle du boss
 
         const texteSalleServeur = MeshBuilder.CreateText("txtSalleServeur", "Salle serveur", fontData, {
             size: 0.2,
@@ -434,9 +431,7 @@ class OfficeScene {
 
         //color
         const enigmaTextColor = new StandardMaterial("textColor", scene);
-        // textColor.diffuseColor = Color3.White();
-        textColor.diffuseColor = Color3.Black();
-        //textColor.alpha = 0.8;
+        enigmaTextColor.diffuseColor = Color3.Black();
 
         texteEnigmeSallePause.position = new Vector3(51.51, 5, -6);
         texteEnigmeSallePause.rotation = new Vector3(0, Math.PI / 2, Math.PI * -0.10);
