@@ -52,7 +52,10 @@ questionDB.set("enigmeRouille", [new EnigmaDisplay("Pourquoi l'utilisation de pr
 questionDB.set("enignmeFumoir", [new EnigmaDisplay("Quelles sont les conséquences possibles pour une entreprise qui ne gère pas correctement les mégots de cigarettes sur son lieu de travail ?", ["Amende pour non-respect des normes environnementales", "Perte de productivité des employés", "Réduction de la satisfaction des employés en raison de la mauvaise gestion des déchets"], 1)
     , new EnigmaDisplay("Comment l'entreprise peut-elle impliquer les employés dans le processus de transformation de l'ancien fumoir en une autre pièce ?", ["En organisant des groupes de travail pour identifier les besoins des employés en matière de nouvelles pièces", "En ne prenant en compte que son profit", "En proposant un vote aux employés pour décider de la nouvelle pièce"], 1)]);
 
-questionDB.set("enigmeMainframe", [new EnigmaDisplay("", ["", "", ""], 1)]);
+// Q1 = https://www.economie.gouv.fr/entreprises/responsabilite-societale-entreprises-rse
+questionDB.set("enigmeMainframe", [new EnigmaDisplay("Parmi ces thématiques laquelle ne définit pas le périmètre de la RSE dans la norme ISO 26000 ?", ["Les relations et conditions de travail", "Le développement durable", "Les communautés et le développement local."], 1)
+    // Q2 = https://www.ecologie.gouv.fr/responsabilite-societale-des-entreprises
+    , new EnigmaDisplay("En quelle année la commission Européenne a-t-elle définit la RSE ?", ["1997", "2006", "2011"], 3)]);
 
 class EnigmaHandler {
     private _isSolved: boolean;

@@ -11,4 +11,8 @@ function gamesEnd() {
     text.text = "Félicitations ! Vous avez terminé le jeu !";
 
     text.color = "white";
+
+    texture.addControl(text);
 }
+
+export default gamesEnd;

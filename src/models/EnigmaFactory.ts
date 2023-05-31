@@ -1,5 +1,6 @@
 import Dialog from "../display/Dialog";
 import DialogHandler from "../display/DialogHandler";
+import gamesEnd from "../display/GameEndDisplay";
 import LightHandler from "../display/LightHandler";
 import Door from "./Door";
 import { getItemByName } from "./ModelFactory";
@@ -49,12 +50,18 @@ let enigmeSteve = () => {
     DialogHandler.instance.showNextDialog();
 }
 
+let end = () => {
+    gamesEnd();
+}
+
 let resolver: Map<string, () => void> = new Map<string, () => void>();
 
 // TODO changer la fonction de résolution pou rallumer les lumières
 resolver.set("enigmeArmoireElec", enigmePanneauElec);
 
 resolver.set("enigmeSteve", enigmeSteve);
+
+resolver.set("enigmeMainframe", end);
 
 function getResolver(name: string): () => void {
     return resolver.get(name) || wip;
