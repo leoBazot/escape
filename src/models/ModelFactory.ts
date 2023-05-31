@@ -57,6 +57,15 @@ function postCreation(): void {
         return false;
     }
 
+    database.get("badgeServeur").use = () => {
+        let badge = new Dialog("Vous", "Quelle idée d'utiliser un badge comme marque-page !");
+
+        DialogHandler.instance.addDialog(badge);
+        DialogHandler.instance.showNextDialog();
+
+        return false;
+    }
+
     const steve = database.get("enigmeSteve") as Enigma;
     steve.item = database.get("pickableCafePause_primitive0");
     steve.onFailure = noItemEnigmeSteve;

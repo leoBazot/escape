@@ -145,6 +145,13 @@ class OfficeScene {
             scene
         );
 
+        const steveBalais = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/characters/",
+            "steveBalais.glb",
+            scene
+        );
+
         createDatabase(salleTravail.meshes);
 
         createDatabase(sallePause.meshes);
@@ -160,6 +167,8 @@ class OfficeScene {
         createDatabase(toilettes.meshes);
 
         createDatabase(steveDodo.meshes);
+
+        createDatabase(steveBalais.meshes);
 
         setKeystoDoors();
 
@@ -331,7 +340,6 @@ class OfficeScene {
                 if (kbInfo.event.key === "e" || kbInfo.event.key === "E") {
                     const raycastHit = scene.pickWithRay(ray);
 
-                    console.log(raycastHit.pickedMesh.name);
 
                     if (raycastHit.hit) {
                         const item = getItemByName(raycastHit.pickedMesh.name);
@@ -365,7 +373,6 @@ class OfficeScene {
                 if (kbInfo.event.key === " ") {
                     DialogHandler.instance.showNextDialog();
                 }
-
             }
         });
 
@@ -422,7 +429,21 @@ class OfficeScene {
         TexteSalleBoss.rotation = new Vector3(0, Math.PI / 2, 0);
         TexteSalleBoss.material = textColor;
 
+        const texteEnigmeSallePause = MeshBuilder.CreateText("txtEnigmeSallePause", "L'un des quatres est la clef !", fontData, {
+            size: 0.2,
+            resolution: 64,
+            depth: 0.1
+        }, scene);
 
+        //color
+        const enigmaTextColor = new StandardMaterial("textColor", scene);
+        // textColor.diffuseColor = Color3.White();
+        textColor.diffuseColor = Color3.Black();
+        //textColor.alpha = 0.8;
+
+        texteEnigmeSallePause.position = new Vector3(51.51, 5, -6);
+        texteEnigmeSallePause.rotation = new Vector3(0, Math.PI / 2, Math.PI * -0.10);
+        texteEnigmeSallePause.material = enigmaTextColor;
     }
 }
 

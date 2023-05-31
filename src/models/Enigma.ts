@@ -38,13 +38,19 @@ class Enigma extends Item {
     public onFailure() { }
 
     public use(mesh?: Item): boolean {
+        let ret = false;
         if (!this._item || this._item.equals(mesh)) {
+            if (this._item) {
+                ret = true;
+                this._item = undefined;
+            }
             SceneHandler.instance.currentScene.getEngine().exitPointerlock();
             EnigmaHandler.instance.showEnigma(this);
         } else {
             this.onFailure();
         }
-        return false;
+
+        return ret;
     }
 }
 

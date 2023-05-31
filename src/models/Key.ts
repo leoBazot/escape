@@ -16,7 +16,7 @@ class Key extends PickableItem {
     }
 
     public use(): boolean {
-        return this._door.open(this);
+        return false;
     }
 }
 

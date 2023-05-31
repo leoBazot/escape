@@ -2,6 +2,7 @@ import Dialog from "../display/Dialog";
 import DialogHandler from "../display/DialogHandler";
 import gamesEnd from "../display/GameEndDisplay";
 import LightHandler from "../display/LightHandler";
+import SceneHandler from "../scenes/SceneHandler";
 import Door from "./Door";
 import { getItemByName } from "./ModelFactory";
 
