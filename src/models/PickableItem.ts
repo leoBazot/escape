@@ -1,5 +1,7 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
 import Item from "./Item";
+import Dialog from "../display/Dialog";
+import DialogHandler from "../display/DialogHandler";
 
 class PickableItem extends Item {
     private _imagePath: string;

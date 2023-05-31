@@ -1,7 +1,7 @@
 import { AbstractMesh } from "@babylonjs/core/Meshes/abstractMesh";
-import { WrongKeyError, createWrongKeyError } from "../errors/DoorErrors";
 import Item from "./Item";
 import Key from "./Key";
+import { doorClosedDefaultDialog } from "../display/DialogHandler";
 
 class Door extends Item {
 
@@ -28,8 +28,14 @@ class Door extends Item {
             this._mesh.dispose();
             return true
         } else {
+            doorClosedDefaultDialog();
             return false;
         }
+    }
+
+    public forceOpen(): void {
+        this._isLocked = false;
+        this._mesh.dispose();
     }
 
     public use(mesh?: Item): boolean {

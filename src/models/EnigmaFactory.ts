@@ -1,6 +1,8 @@
 import Dialog from "../display/Dialog";
 import DialogHandler from "../display/DialogHandler";
 import LightHandler from "../display/LightHandler";
+import Door from "./Door";
+import { getItemByName } from "./ModelFactory";
 
 // fonction pour les enigmes en cours de création
 let wip = () => {
@@ -25,12 +27,34 @@ let dialogExample = () => {
 
 let enigmePanneauElec = () => {
     LightHandler.instance.lightsOn();
+
+    let resolvElec = new Dialog("Vous", "Bizarre commme système de redémarrage mais tant que ça marche...");
+
+    DialogHandler.instance.addDialog(resolvElec);
+    DialogHandler.instance.showNextDialog();
+}
+
+let enigmeSteve = () => {
+    let door = getItemByName("porteFumoir") as Door;
+    door.forceOpen();
+
+    getItemByName("enigmeSteve").mesh.dispose();
+
+    let resolvSteve = [new Dialog("Steve", "Du café ?!! \nDonnes moi ça tout de suite! (...) Qu'est ce que ça fait du bien! \nC'est pas toujours facile de bosser 10h par jour...")
+        , new Dialog("Vous", "Tu m'étonnes! Content que tu aille mieux")
+        , new Dialog("Steve", "Merci, avec ça je vais pouvoir me remettre au travail.")];
+
+    DialogHandler.instance.addDialogs(resolvSteve);
+
+    DialogHandler.instance.showNextDialog();
 }
 
 let resolver: Map<string, () => void> = new Map<string, () => void>();
 
 // TODO changer la fonction de résolution pou rallumer les lumières
-resolver.set("enigmeporteArmoire", enigmePanneauElec);
+resolver.set("enigmeArmoireElec", enigmePanneauElec);
+
+resolver.set("enigmeSteve", enigmeSteve);
 
 function getResolver(name: string): () => void {
     return resolver.get(name) || wip;

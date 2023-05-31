@@ -7,6 +7,8 @@ import Key from "./Key";
 import PickableItem from "./PickableItem";
 import { getResolver } from "./EnigmaFactory";
 import LightHandler from "../display/LightHandler";
+import DialogHandler, { noItemEnigmeSteve } from "../display/DialogHandler";
+import Dialog from "../display/Dialog";
 
 const creator = new Map<string, (mesh: AbstractMesh) => Item>;
 
@@ -44,9 +46,20 @@ function postCreation(): void {
     database.delete("pickableCafePause_primitive2");
     database.delete("pickableCafePause_primitive3");
 
-    database.delete("enigmeporte2Elec");
-
     LightHandler.instance.lightsOff();
+
+    database.get("badgePause").use = () => {
+        let badge = new Dialog("Vous", "Tiens quelqu'un a dû oublier ça. \n Je comprends pas pourquoi j'en ais toujours pas mais je devrai pouvoir me promener un peu plus");
+
+        DialogHandler.instance.addDialog(badge);
+        DialogHandler.instance.showNextDialog();
+
+        return false;
+    }
+
+    const steve = database.get("enigmeSteve") as Enigma;
+    steve.item = database.get("pickableCafePause_primitive0");
+    steve.onFailure = noItemEnigmeSteve;
 }
 
 function getItemByName(name: string): Item {

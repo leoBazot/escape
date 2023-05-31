@@ -23,14 +23,26 @@ class Enigma extends Item {
         this._isSolved = isSolved;
     }
 
+    public get item(): Item {
+        return this._item;
+    }
+
+    public set item(item: Item) {
+        this._item = item;
+    }
+
     public get onSuccess(): () => void {
         return this._onSuccess;
     }
+
+    public onFailure() { }
 
     public use(mesh?: Item): boolean {
         if (!this._item || this._item.equals(mesh)) {
             SceneHandler.instance.currentScene.getEngine().exitPointerlock();
             EnigmaHandler.instance.showEnigma(this);
+        } else {
+            this.onFailure();
         }
         return false;
     }

@@ -1,7 +1,7 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
 import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { Color3, Matrix, Vector3 } from "@babylonjs/core/Maths/math";
+import { Color3, Color4, Matrix, Vector3 } from "@babylonjs/core/Maths/math";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
@@ -24,7 +24,7 @@ import { Player } from "../models/Player";
 import SceneHandler from "./SceneHandler";
 import PickableItem from "../models/PickableItem";
 import { createDatabase, getItemByName, postCreation, setKeystoDoors } from "../models/ModelFactory";
-import DialogHandler from "../display/DialogHandler";
+import DialogHandler, { doorOpenDefaultDialog } from "../display/DialogHandler";
 import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import Enigma from "../models/Enigma";
@@ -83,6 +83,8 @@ class OfficeScene {
 
         scene.getEngine().hideLoadingUI();
 
+        doorOpenDefaultDialog();
+
         SceneHandler.instance.currentScene = scene;
     }
 
@@ -136,9 +138,12 @@ class OfficeScene {
             scene
         );
 
-        salleTravail.lights.forEach((light) => {
-            light.intensity = 0.5;
-        });
+        const steveDodo = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/characters/",
+            "steve.glb",
+            scene
+        );
 
         createDatabase(salleTravail.meshes);
 
@@ -153,6 +158,8 @@ class OfficeScene {
         createDatabase(serveur.meshes);
 
         createDatabase(toilettes.meshes);
+
+        createDatabase(steveDodo.meshes);
 
         setKeystoDoors();
 
@@ -318,7 +325,7 @@ class OfficeScene {
 
                 const ray = scene.createPickingRay(x, y, Matrix.Identity(), camera);
 
-                // ray.length = 8;
+                ray.length = 8;
 
                 // pick up item
                 if (kbInfo.event.key === "e" || kbInfo.event.key === "E") {
@@ -332,6 +339,7 @@ class OfficeScene {
                         if (item) {
                             if (item instanceof PickableItem) {
                                 this._player.inventory.addItem(item);
+                                item.use();
                                 raycastHit.pickedMesh.dispose();
                                 this.createInventory();
                             } else {
