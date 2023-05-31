@@ -46,7 +46,7 @@ questionDB.set("enigmeSteve", [new EnigmaDisplay("Quels sont les avantages de l'
     , new EnigmaDisplay("Comment l'utilisation des salles de pause peut-elle être bénéfique pour l'environnement ?", ["En réduisant l'utilisation de la climatisation dans les bureaux", "En réduisant les déchets alimentaires grâce à l'utilisation de vaisselle réutilisable ", "En encourageant les employés à prendre les transports en commun pour aller travailler"], 2)]);
 
 // Q1 = https://www.economie.gouv.fr/entreprises/responsabilite-societale-entreprises-rse
-questionDB.set("enigmeMainframe", [new EnigmaDisplay("Parmi ces thématiques laquelle ne définit pas le périmètre de la RSE dans la norme ISO 26000 ?", ["Les relations et conditions de travail", "Le développement durable", "Les communautés et le développement local."], 2)
+questionDB.set("enigmeMainframe_primitive1", [new EnigmaDisplay("Parmi ces thématiques laquelle ne définit pas le périmètre de la RSE dans la norme ISO 26000 ?", ["Les relations et conditions de travail", "Le développement durable", "Les communautés et le développement local."], 2)
     // Q2 = https://www.ecologie.gouv.fr/responsabilite-societale-des-entreprises
     , new EnigmaDisplay("En quelle année la commission Européenne a-t-elle définit la RSE ?", ["1997", "2006", "2011"], 3)]);
 
@@ -88,9 +88,6 @@ class EnigmaHandler {
 
         if (enigmaDisplays) {
             const rand: number = Math.floor(Math.random() * (enigmaDisplays.length - 1));
-            console.log(rand);
-            console.log(enigmaDisplays.length);
-            console.log(enigmaDisplays[rand]);
             this._enigmaDisplay = enigmaDisplays[rand];
             this.show();
         }
@@ -177,7 +174,7 @@ class EnigmaHandler {
         setTimeout(() => {
             this.dispose();
             this._isSolved = false;
-        }, 1000);
+        }, 600);
     }
 
     private _onSucces(): void {

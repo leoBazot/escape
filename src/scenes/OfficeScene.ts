@@ -1,7 +1,6 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
-import { Color3, Color4, Matrix, Vector3 } from "@babylonjs/core/Maths/math";
+import { Color3, Matrix, Vector3 } from "@babylonjs/core/Maths/math";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
 import { DynamicTexture } from "@babylonjs/core/Materials/Textures/dynamicTexture";
@@ -29,7 +28,6 @@ import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import Enigma from "../models/Enigma";
 import { EscapeLoadingScreen } from "../display/EscapeLoadingScreen";
-import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
 import LightHandler from "../display/LightHandler";
 
 class OfficeScene {
@@ -339,7 +337,6 @@ class OfficeScene {
                 // pick up item
                 if (kbInfo.event.key === "e" || kbInfo.event.key === "E") {
                     const raycastHit = scene.pickWithRay(ray);
-
 
                     if (raycastHit.hit) {
                         const item = getItemByName(raycastHit.pickedMesh.name);
