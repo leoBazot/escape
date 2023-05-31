@@ -2,10 +2,9 @@
 <html>
 
 <head>
-    <!--
-    <link rel="shortcut icon" href="#">
+    <link rel="shortcut icon" href="./banana.ico">
     <link rel="shortcut" href="../assets/rooms/salle_travail.glb">
-    -->
+
     <script src="https://cdn.babylonjs.com/babylon.js"></script>
     <script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
     <meta charset="UTF-8">
@@ -32,7 +31,7 @@
             display: flex;
             padding-left: 8%;
             padding-right: 8%;
-            border: 1 solid blue;
+            border: 1 solid rgb(30, 162, 61);
         }
 
 
@@ -46,7 +45,7 @@
         .wave {
             width: 5px;
             height: 80px;
-            background: linear-gradient(45deg, cyan, #fff);
+            background: linear-gradient(45deg, rgb(30, 162, 61), #fff);
             margin: 10px;
             animation: wave 1s linear infinite;
             border-radius: 20px;
@@ -106,19 +105,25 @@
 
 <body>
     <div id="loadingScreen">
-        <div id="texteIntro">
-            Bienvenue dans EscApe,
-            où de l’ombre à la lumière il n’y a que des énigmes !
-            <br />
-            Au sein de cette entreprise dystopique
-            vous allez devoir vous enfuir, en résolvant des énigmes.
-            <!--
-            <br />
-            Vous incarnez un personnage mystérieux qui ne cessera d’évoluer tout au long du jeu.
-            -->
-            <br />
-            Seuls les enquêteurs les plus chevronnés réussiront à s'échapper de l’entreprise et découvriront qui ils
-            sont vraiment.
+        <div id="texteIntro" style="font-size: large;">
+            <img src="images/logo.png" />
+            <font face="Calibri">
+                <strong style="font-size: xx-large;">Bienvenue dans EscApe,<br /></strong>
+                où de l’ombre à la lumière il n’y a que des énigmes !
+                <br />
+                Au sein de cette entreprise dystopique
+                vous allez devoir vous enfuir, en résolvant des énigmes.
+                <!--
+                <br />
+                Vous incarnez un personnage mystérieux qui ne cessera d’évoluer tout au long du jeu.
+                -->
+                <br />
+                Seuls les enquêteurs les plus chevronnés réussiront à s'échapper de l’entreprise et découvriront qui ils
+                sont vraiment.
+                <br /><br />
+                <strong>Votre mission si vous l’acceptez :</strong> Découvrir et explorer toute la carte afin de changer
+                l’entreprise en société plus responsable.
+            </font>
         </div>
         <div class="loadingAnim">
             <div class="wave"></div>

@@ -1,6 +1,5 @@
 import { Engine } from "@babylonjs/core/Engines/engine";
 import { Scene } from "@babylonjs/core/scene";
-import { HemisphericLight } from "@babylonjs/core/Lights/hemisphericLight";
 import { Color3, Matrix, Vector3 } from "@babylonjs/core/Maths/math";
 import { SceneLoader } from "@babylonjs/core/Loading/sceneLoader";
 import { FreeCamera } from "@babylonjs/core/Cameras/freeCamera";
@@ -24,12 +23,11 @@ import { Player } from "../models/Player";
 import SceneHandler from "./SceneHandler";
 import PickableItem from "../models/PickableItem";
 import { createDatabase, getItemByName, postCreation, setKeystoDoors } from "../models/ModelFactory";
-import DialogHandler from "../display/DialogHandler";
+import DialogHandler, { doorOpenDefaultDialog } from "../display/DialogHandler";
 import { HighlightLayer } from "@babylonjs/core/Layers/highlightLayer";
 import { Mesh } from "@babylonjs/core/Meshes/mesh";
 import Enigma from "../models/Enigma";
 import { EscapeLoadingScreen } from "../display/EscapeLoadingScreen";
-import { GlowLayer } from "@babylonjs/core/Layers/glowLayer";
 import LightHandler from "../display/LightHandler";
 
 class OfficeScene {
@@ -83,6 +81,8 @@ class OfficeScene {
 
         scene.getEngine().hideLoadingUI();
 
+        doorOpenDefaultDialog();
+
         SceneHandler.instance.currentScene = scene;
     }
 
@@ -94,12 +94,16 @@ class OfficeScene {
             scene
         );
 
+        createDatabase(salleTravail.meshes);
+
         const sallePause = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
             "sallePause.glb",
             scene
         );
+
+        createDatabase(sallePause.meshes);
 
         const boss = await SceneLoader.ImportMeshAsync(
             "",
@@ -108,12 +112,16 @@ class OfficeScene {
             scene
         );
 
+        createDatabase(boss.meshes);
+
         const corridor = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
             "corridor.glb",
             scene
         );
+
+        createDatabase(corridor.meshes);
 
         const reuBalais = await SceneLoader.ImportMeshAsync(
             "",
@@ -122,12 +130,16 @@ class OfficeScene {
             scene
         );
 
+        createDatabase(reuBalais.meshes);
+
         const serveur = await SceneLoader.ImportMeshAsync(
             "",
             "./models/rooms/",
             "serveur.glb",
             scene
         );
+
+        createDatabase(serveur.meshes);
 
         const toilettes = await SceneLoader.ImportMeshAsync(
             "",
@@ -136,23 +148,25 @@ class OfficeScene {
             scene
         );
 
-        salleTravail.lights.forEach((light) => {
-            light.intensity = 0.5;
-        });
-
-        createDatabase(salleTravail.meshes);
-
-        createDatabase(sallePause.meshes);
-
-        createDatabase(boss.meshes);
-
-        createDatabase(corridor.meshes);
-
-        createDatabase(reuBalais.meshes);
-
-        createDatabase(serveur.meshes);
-
         createDatabase(toilettes.meshes);
+
+        const steveDodo = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/characters/",
+            "steve.glb",
+            scene
+        );
+
+        createDatabase(steveDodo.meshes);
+
+        const steveBalais = await SceneLoader.ImportMeshAsync(
+            "",
+            "./models/characters/",
+            "steveBalais.glb",
+            scene
+        );
+
+        createDatabase(steveBalais.meshes);
 
         setKeystoDoors();
 
@@ -318,13 +332,11 @@ class OfficeScene {
 
                 const ray = scene.createPickingRay(x, y, Matrix.Identity(), camera);
 
-                // ray.length = 8;
+                ray.length = 8;
 
                 // pick up item
                 if (kbInfo.event.key === "e" || kbInfo.event.key === "E") {
                     const raycastHit = scene.pickWithRay(ray);
-
-                    console.log(raycastHit.pickedMesh.name);
 
                     if (raycastHit.hit) {
                         const item = getItemByName(raycastHit.pickedMesh.name);
@@ -332,6 +344,7 @@ class OfficeScene {
                         if (item) {
                             if (item instanceof PickableItem) {
                                 this._player.inventory.addItem(item);
+                                item.use();
                                 raycastHit.pickedMesh.dispose();
                                 this.createInventory();
                             } else {
@@ -357,7 +370,6 @@ class OfficeScene {
                 if (kbInfo.event.key === " ") {
                     DialogHandler.instance.showNextDialog();
                 }
-
             }
         });
 
@@ -365,11 +377,10 @@ class OfficeScene {
     }
 
     public async createText(scene: Scene) {
-        const fontData = await (await fetch("./fonts/Droid Sans_Regular.json")).json(); // Providing you have a font data file at that location
+        const fontData = await (await fetch("./fonts/Droid Sans_Regular.json")).json();
 
         //color
         const textColor = new StandardMaterial("textColor", scene);
-        // textColor.diffuseColor = Color3.White();
         textColor.emissiveColor = Color3.White();
         textColor.alpha = 0.8;
 
@@ -382,8 +393,6 @@ class OfficeScene {
         texteSalleDePause.position = new Vector3(-7.55, 5.3, 6.7);
         texteSalleDePause.rotation = new Vector3(0, Math.PI * 3 / 2, 0);
         texteSalleDePause.material = textColor;
-
-        // TODO salle serveur, salle réunion, salle du boss
 
         const texteSalleServeur = MeshBuilder.CreateText("txtSalleServeur", "Salle serveur", fontData, {
             size: 0.2,
@@ -414,7 +423,19 @@ class OfficeScene {
         TexteSalleBoss.rotation = new Vector3(0, Math.PI / 2, 0);
         TexteSalleBoss.material = textColor;
 
+        const texteEnigmeSallePause = MeshBuilder.CreateText("txtEnigmeSallePause", "L'un des quatres est la clef !", fontData, {
+            size: 0.2,
+            resolution: 64,
+            depth: 0.1
+        }, scene);
 
+        //color
+        const enigmaTextColor = new StandardMaterial("textColor", scene);
+        enigmaTextColor.diffuseColor = Color3.Black();
+
+        texteEnigmeSallePause.position = new Vector3(51.51, 5, -6);
+        texteEnigmeSallePause.rotation = new Vector3(0, Math.PI / 2, Math.PI * -0.10);
+        texteEnigmeSallePause.material = enigmaTextColor;
     }
 }
 
